@@ -65,6 +65,14 @@ public class Pixel {
                     System.out.println("Please specify a valid task number after unmark.");
                 }
                 System.out.println(line);
+            } else if (command.startsWith("todo ")){
+                String description = command.substring(5);
+                tasks[taskCount] = new Todo(description);
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[taskCount]);
+                taskCount++;
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(line);
             } else {
                 tasks[taskCount] = new Task(command);
                 taskCount++;
