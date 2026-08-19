@@ -2,6 +2,41 @@
 
 Run each test case in a fresh instance of `Pixel`. Output comparisons are exact except that CRLF and LF line endings are considered equivalent. Each command below is followed by Enter.
 
+## UI-00: Reject an empty ToDo and an unknown command
+
+**Aim:** Verify that a ToDo without a description and an unrecognized command produce the required error messages without being added as tasks.
+
+**Input commands:**
+
+```text
+todo
+blah
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Oops! Please give me a description for the todo.
+____________________________________________________________
+____________________________________________________________
+Sorry, I don't recognise that command.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
 ## UI-01: Add and list tasks
 
 **Aim:** Verify that Pixel stores entered task descriptions, lists them in order as not done, and exits on `bye`.
@@ -9,8 +44,8 @@ Run each test case in a fresh instance of `Pixel`. Output comparisons are exact 
 **Input commands:**
 
 ```text
-read book
-return book
+todo read book
+todo return book
 list
 bye
 ```
@@ -28,15 +63,19 @@ Hello! I'm Pixel.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-added: read book
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-added: return book
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[ ] read book
-2.[ ] return book
+1.[T][ ] read book
+2.[T][ ] return book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -50,8 +89,8 @@ ____________________________________________________________
 **Input commands:**
 
 ```text
-read book
-return book
+todo read book
+todo return book
 mark 2
 list
 unmark 2
@@ -72,28 +111,32 @@ Hello! I'm Pixel.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-added: read book
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-added: return book
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [X] return book
+  [T][X] return book
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[ ] read book
-2.[X] return book
+1.[T][ ] read book
+2.[T][X] return book
 ____________________________________________________________
 ____________________________________________________________
 OK, I've marked this task as not done yet:
-  [ ] return book
+  [T][ ] return book
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[ ] read book
-2.[ ] return book
+1.[T][ ] read book
+2.[T][ ] return book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -198,16 +241,16 @@ Hello! I'm Pixel.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-Please use: deadline DESCRIPTION /by DATE/TIME
+Oops! Please specify the deadline using /by.
 ____________________________________________________________
 ____________________________________________________________
-Please use: deadline DESCRIPTION /by DATE/TIME
+Oops! Please specify the deadline using /by.
 ____________________________________________________________
 ____________________________________________________________
-Please use: event DESCRIPTION /from START /to END
+Oops! Please specify the event using /from and /to.
 ____________________________________________________________
 ____________________________________________________________
-Please use: event DESCRIPTION /from START /to END
+Oops! The event description and times cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -217,6 +260,200 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] valid task
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-05: Preserve task state across rejected creation commands
+
+**Aim:** Verify that invalid Deadline, Event, and unknown commands interleaved with valid additions neither create tasks nor disturb task order.
+
+**Input commands:**
+
+```text
+todo alpha
+deadline missing deadline
+deadline beta /by Sunday
+event broken /from /to Friday
+event gamma /from Monday /to Tuesday
+blah
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Oops! Please specify the deadline using /by.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] beta (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Oops! The event description and times cannot be empty.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] gamma (from: Monday to: Tuesday)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Sorry, I don't recognise that command.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+2.[D][ ] beta (by: Sunday)
+3.[E][ ] gamma (from: Monday to: Tuesday)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-06: Preserve completion state across invalid task numbers
+
+**Aim:** Verify that invalid, out-of-range, zero, and nonnumeric mark/unmark commands do not modify the completion state of existing tasks.
+
+**Input commands:**
+
+```text
+todo alpha
+mark 1
+mark 0
+mark 2
+mark abc
+unmark 1
+unmark 0
+unmark abc
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] alpha
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [T][ ] alpha
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after unmark.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-07: Recover after missing task fields
+
+**Aim:** Verify that empty descriptions and missing date/time fields are rejected and that a subsequent valid task can still be added and listed.
+
+**Input commands:**
+
+```text
+todo
+deadline
+deadline homework /by
+event
+event meeting /from Monday
+event meeting /from Monday /to
+todo recovered
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Oops! Please give me a description for the todo.
+____________________________________________________________
+____________________________________________________________
+Oops! Please give me a description and deadline.
+____________________________________________________________
+____________________________________________________________
+Oops! Please specify the deadline using /by.
+____________________________________________________________
+____________________________________________________________
+Oops! Please give me an event description and time.
+____________________________________________________________
+____________________________________________________________
+Oops! Please specify the event using /from and /to.
+____________________________________________________________
+____________________________________________________________
+Oops! The event description and times cannot be empty.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] recovered
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] recovered
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

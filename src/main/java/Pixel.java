@@ -65,49 +65,71 @@ public class Pixel {
                     System.out.println("Please specify a valid task number after unmark.");
                 }
                 System.out.println(line);
-            } else if (command.startsWith("todo ")){
-                String description = command.substring(5);
-                tasks[taskCount] = new Todo(description);
-                taskCount++;
-                printTaskAdded(tasks[taskCount - 1], taskCount, line);
-            } else if (command.startsWith("deadline ")) {
-                String details = command.substring(9);
-                String[] parts = details.split(" /by ", 2);
-                if (parts.length < 2 || parts[0].isBlank() || parts[1].isBlank()) {
-                    System.out.println("Please use: deadline DESCRIPTION /by DATE/TIME");
+            } else if (command.equals("todo") || command.startsWith("todo ")){
+                String description = "";
+                if (command.length() > 4) {
+                    description = command.substring(4).trim();
+                }
+                if (description.isEmpty()) {
+                    System.out.println("Oops! Please give me a description for the todo.");
                     System.out.println(line);
                 } else {
-                    String description = parts[0];
-                    String by = parts[1];
-                    tasks[taskCount] = new Deadline(description, by);
+                    tasks[taskCount] = new Todo(description);
                     taskCount++;
                     printTaskAdded(tasks[taskCount - 1], taskCount, line);
                 }
-            } else if (command.startsWith("event ")) {
-                String details = command.substring(6);
-                String[] fromParts = details.split(" /from ", 2);
-                if (fromParts.length < 2) {
-                    System.out.println("Please use: event DESCRIPTION /from START /to END");
+            } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+                String details = "";
+                if (command.length() > 8) {
+                    details = command.substring(8).trim();
+                }
+                if (details.isEmpty()) {
+                    System.out.println("Oops! Please give me a description and deadline.");
+                    System.out.println(line);
+                } else if (!details.contains(" /by ")) {
+                    System.out.println("Oops! Please specify the deadline using /by.");
                     System.out.println(line);
                 } else {
-                    String description = fromParts[0];
-                    String[] toParts = fromParts[1].split(" /to ", 2);
-                    if (toParts.length < 2 || description.isBlank()
-                            || toParts[0].isBlank() || toParts[1].isBlank()) {
-                        System.out.println("Please use: event DESCRIPTION /from START /to END");
+                    String[] parts = details.split(" /by ", 2);
+                    String description = parts[0].trim();
+                    String by = parts[1].trim();
+                    if (description.isEmpty() || by.isEmpty()) {
+                        System.out.println("Oops! The deadline description and date cannot be empty.");
                         System.out.println(line);
                     } else {
-                        String from = toParts[0];
-                        String to = toParts[1];
+                        tasks[taskCount] = new Deadline(description, by);
+                        taskCount++;
+                        printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                    }
+                }
+            } else if (command.equals("event") || command.startsWith("event ")) {
+                String details = "";
+                if (command.length() > 5) {
+                    details = command.substring(5).trim();
+                }
+                int fromIndex = details.indexOf("/from");
+                int toIndex = fromIndex < 0 ? -1 : details.indexOf("/to", fromIndex + 5);
+                if (details.isEmpty()) {
+                    System.out.println("Oops! Please give me an event description and time.");
+                    System.out.println(line);
+                } else if (fromIndex < 0 || toIndex < 0) {
+                    System.out.println("Oops! Please specify the event using /from and /to.");
+                    System.out.println(line);
+                } else {
+                    String description = details.substring(0, fromIndex).trim();
+                    String from = details.substring(fromIndex + 5, toIndex).trim();
+                    String to = details.substring(toIndex + 3).trim();
+                    if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                        System.out.println("Oops! The event description and times cannot be empty.");
+                        System.out.println(line);
+                    } else {
                         tasks[taskCount] = new Event(description, from, to);
                         taskCount++;
                         printTaskAdded(tasks[taskCount - 1], taskCount, line);
                     }
                 }
             } else {
-                tasks[taskCount] = new Task(command);
-                taskCount++;
-                System.out.println("added: " + command);
+                System.out.println("Sorry, I don't recognise that command.");
                 System.out.println(line);
             }
         }
