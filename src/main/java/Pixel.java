@@ -68,11 +68,42 @@ public class Pixel {
             } else if (command.startsWith("todo ")){
                 String description = command.substring(5);
                 tasks[taskCount] = new Todo(description);
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[taskCount]);
                 taskCount++;
-                System.out.println("Now you have " + taskCount + " tasks in the list.");
-                System.out.println(line);
+                printTaskAdded(tasks[taskCount - 1], taskCount, line);
+            } else if (command.startsWith("deadline ")) {
+                String details = command.substring(9);
+                String[] parts = details.split(" /by ", 2);
+                if (parts.length < 2 || parts[0].isBlank() || parts[1].isBlank()) {
+                    System.out.println("Please use: deadline DESCRIPTION /by DATE/TIME");
+                    System.out.println(line);
+                } else {
+                    String description = parts[0];
+                    String by = parts[1];
+                    tasks[taskCount] = new Deadline(description, by);
+                    taskCount++;
+                    printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                }
+            } else if (command.startsWith("event ")) {
+                String details = command.substring(6);
+                String[] fromParts = details.split(" /from ", 2);
+                if (fromParts.length < 2) {
+                    System.out.println("Please use: event DESCRIPTION /from START /to END");
+                    System.out.println(line);
+                } else {
+                    String description = fromParts[0];
+                    String[] toParts = fromParts[1].split(" /to ", 2);
+                    if (toParts.length < 2 || description.isBlank()
+                            || toParts[0].isBlank() || toParts[1].isBlank()) {
+                        System.out.println("Please use: event DESCRIPTION /from START /to END");
+                        System.out.println(line);
+                    } else {
+                        String from = toParts[0];
+                        String to = toParts[1];
+                        tasks[taskCount] = new Event(description, from, to);
+                        taskCount++;
+                        printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                    }
+                }
             } else {
                 tasks[taskCount] = new Task(command);
                 taskCount++;
@@ -80,5 +111,12 @@ public class Pixel {
                 System.out.println(line);
             }
         }
+    }
+
+    public static void printTaskAdded(Task task, int taskCount, String line) {
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println(line);
     }
 }
