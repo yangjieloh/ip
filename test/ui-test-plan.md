@@ -459,3 +459,131 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## UI-08: Delete tasks and preserve list order
+
+**Aim:** Verify that deleting a middle task removes the correct object, shifts later tasks forward, updates the count, and uses the new numbering for a subsequent deletion.
+
+**Input commands:**
+
+```text
+todo alpha
+deadline beta /by Sunday
+event gamma /from Monday /to Tuesday
+mark 2
+delete 2
+list
+delete 2
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] beta (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] gamma (from: Monday to: Tuesday)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] beta (by: Sunday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [D][X] beta (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+2.[E][ ] gamma (from: Monday to: Tuesday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [E][ ] gamma (from: Monday to: Tuesday)
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-09: Preserve state across invalid delete commands
+
+**Aim:** Verify that zero, out-of-range, and nonnumeric delete commands are rejected without removing or modifying existing tasks.
+
+**Input commands:**
+
+```text
+todo alpha
+mark 1
+delete 0
+delete 2
+delete abc
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] alpha
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after delete.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] alpha
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -17,8 +18,7 @@ public class Pixel {
         System.out.println("What can I do for you?");
         System.out.println(line);
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNextLine()) {
@@ -31,20 +31,20 @@ public class Pixel {
                 break;
             } else if (command.equals("list")) {
                 System.out.println("Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + "." + tasks[i]);
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println((i + 1) + "." + tasks.get(i));
                 }
                 System.out.println(line);
             } else if (command.startsWith("mark ")) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(5).trim());
                     int index = taskNumber - 1;
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         System.out.println("That task number does not exist.");
                     } else {
-                        tasks[index].markAsDone();
+                        tasks.get(index).markAsDone();
                         System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + tasks[index]);
+                        System.out.println("  " + tasks.get(index));
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println("Please specify a valid task number after mark.");
@@ -54,12 +54,12 @@ public class Pixel {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(7).trim());
                     int index = taskNumber - 1;
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         System.out.println("That task number does not exist.");
                     } else {
-                        tasks[index].markAsNotDone();
+                        tasks.get(index).markAsNotDone();
                         System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + tasks[index]);
+                        System.out.println("  " + tasks.get(index));
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println("Please specify a valid task number after unmark.");
@@ -74,9 +74,8 @@ public class Pixel {
                     System.out.println("Oops! Please give me a description for the todo.");
                     System.out.println(line);
                 } else {
-                    tasks[taskCount] = new Todo(description);
-                    taskCount++;
-                    printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                    tasks.add(new Todo(description));
+                    printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                 }
             } else if (command.equals("deadline") || command.startsWith("deadline ")) {
                 String details = "";
@@ -97,9 +96,8 @@ public class Pixel {
                         System.out.println("Oops! The deadline description and date cannot be empty.");
                         System.out.println(line);
                     } else {
-                        tasks[taskCount] = new Deadline(description, by);
-                        taskCount++;
-                        printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                        tasks.add(new Deadline(description, by));
+                        printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
             } else if (command.equals("event") || command.startsWith("event ")) {
@@ -123,11 +121,26 @@ public class Pixel {
                         System.out.println("Oops! The event description and times cannot be empty.");
                         System.out.println(line);
                     } else {
-                        tasks[taskCount] = new Event(description, from, to);
-                        taskCount++;
-                        printTaskAdded(tasks[taskCount - 1], taskCount, line);
+                        tasks.add(new Event(description, from, to));
+                        printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
+            } else if (command.startsWith("delete ")) {
+                try {
+                    int taskNumber = Integer.parseInt(command.substring(7).trim());
+                    int index = taskNumber - 1;
+                    if (index < 0 || index >= tasks.size()) {
+                        System.out.println("That task number does not exist.");
+                    } else {
+                        Task deletedTask = tasks.remove(index);
+                        System.out.println("Noted. I've removed this task:");
+                        System.out.println("  " + deletedTask);
+                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                    }
+                } catch (NumberFormatException exception) {
+                    System.out.println("Please specify a valid task number after delete.");
+                }
+                System.out.println(line);
             } else {
                 System.out.println("Sorry, I don't recognise that command.");
                 System.out.println(line);
