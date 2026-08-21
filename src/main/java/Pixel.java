@@ -23,19 +23,20 @@ public class Pixel {
 
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
+            CommandType commandType = CommandType.fromCommand(command);
             System.out.println(line);
 
-            if (command.equals("bye")) {
+            if (commandType == CommandType.BYE) {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(line);
                 break;
-            } else if (command.equals("list")) {
+            } else if (commandType == CommandType.LIST) {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println((i + 1) + "." + tasks.get(i));
                 }
                 System.out.println(line);
-            } else if (command.startsWith("mark ")) {
+            } else if (commandType == CommandType.MARK) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(5).trim());
                     int index = taskNumber - 1;
@@ -50,7 +51,7 @@ public class Pixel {
                     System.out.println("Please specify a valid task number after mark.");
                 }
                 System.out.println(line);
-            } else if (command.startsWith("unmark ")) {
+            } else if (commandType == CommandType.UNMARK) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(7).trim());
                     int index = taskNumber - 1;
@@ -65,7 +66,7 @@ public class Pixel {
                     System.out.println("Please specify a valid task number after unmark.");
                 }
                 System.out.println(line);
-            } else if (command.equals("todo") || command.startsWith("todo ")){
+            } else if (commandType == CommandType.TODO) {
                 String description = "";
                 if (command.length() > 4) {
                     description = command.substring(4).trim();
@@ -77,7 +78,7 @@ public class Pixel {
                     tasks.add(new Todo(description));
                     printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                 }
-            } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+            } else if (commandType == CommandType.DEADLINE) {
                 String details = "";
                 if (command.length() > 8) {
                     details = command.substring(8).trim();
@@ -100,7 +101,7 @@ public class Pixel {
                         printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
-            } else if (command.equals("event") || command.startsWith("event ")) {
+            } else if (commandType == CommandType.EVENT) {
                 String details = "";
                 if (command.length() > 5) {
                     details = command.substring(5).trim();
@@ -125,7 +126,7 @@ public class Pixel {
                         printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
-            } else if (command.startsWith("delete ")) {
+            } else if (commandType == CommandType.DELETE) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(7).trim());
                     int index = taskNumber - 1;
