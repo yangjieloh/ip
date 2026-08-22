@@ -54,6 +54,29 @@ public class Pixel {
                     System.out.println((i + 1) + "." + tasks.get(i));
                 }
                 System.out.println(line);
+            } else if (commandType == CommandType.DATE) {
+                try {
+                    LocalDate date = LocalDate.parse(command.substring(4).trim());
+                    boolean hasMatchingTask = false;
+                    for (int i = 0; i < tasks.size(); i++) {
+                        if (tasks.get(i).occursOn(date)) {
+                            if (!hasMatchingTask) {
+                                System.out.println("Here are the tasks occurring on "
+                                        + Deadline.formatDate(date) + ":");
+                            }
+                            System.out.println((i + 1) + "." + tasks.get(i));
+                            hasMatchingTask = true;
+                        }
+                    }
+                    if (!hasMatchingTask) {
+                        System.out.println("There are no tasks occurring on "
+                                + Deadline.formatDate(date) + ".");
+                    }
+                } catch (DateTimeParseException exception) {
+                    System.out.println("Oops! Please enter a valid date after date "
+                            + "in YYYY-MM-DD format.");
+                }
+                System.out.println(line);
             } else if (commandType == CommandType.MARK) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(4).trim());

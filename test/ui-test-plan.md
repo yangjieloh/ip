@@ -1032,3 +1032,88 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## UI-17: Find deadlines occurring on a date
+
+**Aim:** Verify that `date` lists Deadlines and ISO-dated Events occurring on a date using original task numbers, includes Events spanning that date, excludes undated tasks, handles no matches, rejects invalid or missing dates, and does not modify task state.
+
+**Input commands:**
+
+```text
+todo undated
+deadline submit report /by 2019-12-02
+deadline return book /by 2019-12-02
+event conference /from 2019-12-01 09:00 /to 2019-12-03 17:00
+deadline later task /by 2019-12-03
+date 2019-12-02
+date 2019-12-04
+date 2023-02-29
+date
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] undated
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] submit report (by: Dec 02 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 02 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] conference (from: 2019-12-01 09:00 to: 2019-12-03 17:00)
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] later task (by: Dec 03 2019)
+Now you have 5 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks occurring on Dec 02 2019:
+2.[D][ ] submit report (by: Dec 02 2019)
+3.[D][ ] return book (by: Dec 02 2019)
+4.[E][ ] conference (from: 2019-12-01 09:00 to: 2019-12-03 17:00)
+____________________________________________________________
+____________________________________________________________
+There are no tasks occurring on Dec 04 2019.
+____________________________________________________________
+____________________________________________________________
+Oops! Please enter a valid date after date in YYYY-MM-DD format.
+____________________________________________________________
+____________________________________________________________
+Oops! Please enter a valid date after date in YYYY-MM-DD format.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] undated
+2.[D][ ] submit report (by: Dec 02 2019)
+3.[D][ ] return book (by: Dec 02 2019)
+4.[E][ ] conference (from: 2019-12-01 09:00 to: 2019-12-03 17:00)
+5.[D][ ] later task (by: Dec 03 2019)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```

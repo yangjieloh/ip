@@ -15,6 +15,21 @@ public class Deadline extends Task {
     }
 
     @Override
+    public boolean occursOn(LocalDate date) {
+        return by.equals(date);
+    }
+
+    /**
+     * Formats a date for console output.
+     *
+     * @param date Date to format.
+     * @return Date in the user-facing format.
+     */
+    public static String formatDate(LocalDate date) {
+        return date.format(DISPLAY_DATE_FORMAT);
+    }
+
+    @Override
     public String toDataString() {
         return "D | " + (isDone ? "1" : "0") + " | " + escapeDataField(description)
                 + " | " + escapeDataField(by.toString());
@@ -23,6 +38,6 @@ public class Deadline extends Task {
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: "
-                + by.format(DISPLAY_DATE_FORMAT) + ")";
+                + formatDate(by) + ")";
     }
 }

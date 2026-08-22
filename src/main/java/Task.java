@@ -28,6 +28,17 @@ public class Task {
     }
 
     /**
+     * Checks whether this task occurs on a given date.
+     * Tasks without a structured date do not occur on any searchable date.
+     *
+     * @param date Date to check.
+     * @return Whether this task occurs on the date.
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
+    }
+
+    /**
      * Returns the representation used when saving this task to disk.
      *
      * @return Serialized task data.
