@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -37,99 +36,17 @@ public class Pixel {
 
         boolean isExit = false;
         while (!isExit && ui.hasNextCommand()) {
-            String command = ui.readCommand();
-            CommandType commandType = parser.parseCommandType(command);
+            String fullCommand = ui.readCommand();
             ui.showLine();
-
-            if (commandType == CommandType.BYE) {
-                Command exitCommand = new ExitCommand();
-                exitCommand.execute(tasks, ui, storage);
-                isExit = exitCommand.isExit();
-                ui.showLine();
-            } else if (commandType == CommandType.LIST) {
-                Command listCommand = new ListCommand();
-                listCommand.execute(tasks, ui, storage);
-                ui.showLine();
-            } else if (commandType == CommandType.DATE) {
-                try {
-                    Command dateCommand = new DateCommand(parser.parseDate(command));
-                    dateCommand.execute(tasks, ui, storage);
-                } catch (IllegalArgumentException exception) {
-                    ui.showMessage(exception.getMessage());
-                }
-                ui.showLine();
-            } else if (commandType == CommandType.MARK) {
-                try {
-                    int index = parser.parseTaskIndex(command, commandType);
-                    if (!tasks.isValidIndex(index)) {
-                        ui.showMessage("That task number does not exist.");
-                    } else {
-                        tasks.markAsDone(index);
-                        saveTasksSafely();
-                        ui.showMessage("Nice! I've marked this task as done:");
-                        ui.showMessage("  " + tasks.get(index));
-                    }
-                } catch (IllegalArgumentException exception) {
-                    ui.showMessage(exception.getMessage());
-                }
-                ui.showLine();
-            } else if (commandType == CommandType.UNMARK) {
-                try {
-                    int index = parser.parseTaskIndex(command, commandType);
-                    if (!tasks.isValidIndex(index)) {
-                        ui.showMessage("That task number does not exist.");
-                    } else {
-                        tasks.markAsNotDone(index);
-                        saveTasksSafely();
-                        ui.showMessage("OK, I've marked this task as not done yet:");
-                        ui.showMessage("  " + tasks.get(index));
-                    }
-                } catch (IllegalArgumentException exception) {
-                    ui.showMessage(exception.getMessage());
-                }
-                ui.showLine();
-            } else if (commandType == CommandType.TODO
-                    || commandType == CommandType.DEADLINE
-                    || commandType == CommandType.EVENT) {
-                try {
-                    Task task = parser.parseTask(command, commandType);
-                    tasks.add(task);
-                    saveTasksSafely();
-                    ui.showTaskAdded(task, tasks.size());
-                } catch (IllegalArgumentException exception) {
-                    ui.showMessage(exception.getMessage());
-                    ui.showLine();
-                }
-            } else if (commandType == CommandType.DELETE) {
-                try {
-                    int index = parser.parseTaskIndex(command, commandType);
-                    if (!tasks.isValidIndex(index)) {
-                        ui.showMessage("That task number does not exist.");
-                    } else {
-                        Task deletedTask = tasks.delete(index);
-                        saveTasksSafely();
-                        ui.showMessage("Noted. I've removed this task:");
-                        ui.showMessage("  " + deletedTask);
-                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
-                    }
-                } catch (IllegalArgumentException exception) {
-                    ui.showMessage(exception.getMessage());
-                }
-                ui.showLine();
-            } else {
-                Command unknownCommand = new UnknownCommand();
-                unknownCommand.execute(tasks, ui, storage);
+            try {
+                Command command = parser.parse(fullCommand);
+                command.execute(tasks, ui, storage);
+                isExit = command.isExit();
+            } catch (IllegalArgumentException exception) {
+                ui.showMessage(exception.getMessage());
+            } finally {
                 ui.showLine();
             }
-        }
-    }
-
-    private void saveTasksSafely() {
-        try {
-            storage.save(tasks);
-        } catch (IOException | SecurityException exception) {
-            ui.showMessage("Oops! I couldn't save your tasks. "
-                    + "Your changes will only last until Pixel exits.");
         }
     }
 

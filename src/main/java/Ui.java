@@ -53,6 +53,5 @@ public class Ui {
         showMessage("Got it. I've added this task:");
         showMessage("  " + task);
         showMessage("Now you have " + taskCount + " tasks in the list.");
-        showLine();
     }
 }

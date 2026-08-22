@@ -7,12 +7,33 @@ import java.time.format.DateTimeParseException;
 public class Parser {
 
     /**
+     * Parses a full user command into an executable command object.
+     *
+     * @param command Full command entered by the user.
+     * @return Command ready to execute.
+     * @throws IllegalArgumentException If a recognized command has invalid arguments.
+     */
+    public Command parse(String command) {
+        CommandType commandType = parseCommandType(command);
+        return switch (commandType) {
+        case BYE -> new ExitCommand();
+        case LIST -> new ListCommand();
+        case DATE -> new DateCommand(parseDate(command));
+        case MARK -> new MarkCommand(parseTaskIndex(command, commandType));
+        case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
+        case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
+        case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
+        case UNKNOWN -> new UnknownCommand();
+        };
+    }
+
+    /**
      * Identifies the type of a command while preserving Pixel's command syntax.
      *
      * @param command Full command entered by the user.
      * @return Matching command type, or {@link CommandType#UNKNOWN} when unrecognized.
      */
-    public CommandType parseCommandType(String command) {
+    private CommandType parseCommandType(String command) {
         if (command.equals("bye")) {
             return CommandType.BYE;
         } else if (command.equals("list")) {
@@ -42,7 +63,7 @@ public class Parser {
      * @return Parsed date.
      * @throws IllegalArgumentException If the date is missing or invalid.
      */
-    public LocalDate parseDate(String command) {
+    private LocalDate parseDate(String command) {
         try {
             return LocalDate.parse(getArguments(command, "date"));
         } catch (DateTimeParseException exception) {
@@ -59,7 +80,7 @@ public class Parser {
      * @return Zero-based task index.
      * @throws IllegalArgumentException If the task number is missing or invalid.
      */
-    public int parseTaskIndex(String command, CommandType commandType) {
+    private int parseTaskIndex(String command, CommandType commandType) {
         String keyword = commandType.name().toLowerCase();
         try {
             return Integer.parseInt(getArguments(command, keyword)) - 1;
@@ -77,7 +98,7 @@ public class Parser {
      * @return Parsed task.
      * @throws IllegalArgumentException If required task details are missing or invalid.
      */
-    public Task parseTask(String command, CommandType commandType) {
+    private Task parseTask(String command, CommandType commandType) {
         return switch (commandType) {
         case TODO -> parseTodo(command);
         case DEADLINE -> parseDeadline(command);

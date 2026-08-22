@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 /**
  * Represents an executable instruction understood by Pixel.
  */
@@ -19,5 +21,21 @@ public abstract class Command {
      */
     public boolean isExit() {
         return false;
+    }
+
+    /**
+     * Saves task changes while keeping Pixel usable if the write fails.
+     *
+     * @param tasks Task list to save.
+     * @param ui User interface used to report a write failure.
+     * @param storage Task persistence service.
+     */
+    protected void saveTasksSafely(TaskList tasks, Ui ui, Storage storage) {
+        try {
+            storage.save(tasks);
+        } catch (IOException | SecurityException exception) {
+            ui.showMessage("Oops! I couldn't save your tasks. "
+                    + "Your changes will only last until Pixel exits.");
+        }
     }
 }
