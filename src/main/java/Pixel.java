@@ -7,14 +7,28 @@ import java.util.ArrayList;
  * Starts the Pixel chatbot application.
  */
 public class Pixel {
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        Storage storage = new Storage(Path.of("data", "pixel.txt"));
-        Parser parser = new Parser();
-        ui.showWelcome();
+    private final Ui ui;
+    private final Storage storage;
+    private final Parser parser;
+    private final TaskList tasks;
+    private final ArrayList<String> loadWarnings;
 
-        ArrayList<String> loadWarnings = new ArrayList<>();
-        TaskList tasks = new TaskList(storage.load(loadWarnings));
+    /**
+     * Creates a Pixel chatbot backed by the specified data file.
+     *
+     * @param filePath Path to the task data file.
+     */
+    public Pixel(Path filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        parser = new Parser();
+        loadWarnings = new ArrayList<>();
+        tasks = new TaskList(storage.load(loadWarnings));
+    }
+
+    /** Starts Pixel's console command loop. */
+    public void run() {
+        ui.showWelcome();
         for (String warning : loadWarnings) {
             ui.showMessage(warning);
         }
@@ -66,7 +80,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.markAsDone(index);
-                        saveTasksSafely(tasks, storage, ui);
+                        saveTasksSafely();
                         ui.showMessage("Nice! I've marked this task as done:");
                         ui.showMessage("  " + tasks.get(index));
                     }
@@ -81,7 +95,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.markAsNotDone(index);
-                        saveTasksSafely(tasks, storage, ui);
+                        saveTasksSafely();
                         ui.showMessage("OK, I've marked this task as not done yet:");
                         ui.showMessage("  " + tasks.get(index));
                     }
@@ -95,7 +109,7 @@ public class Pixel {
                 try {
                     Task task = parser.parseTask(command, commandType);
                     tasks.add(task);
-                    saveTasksSafely(tasks, storage, ui);
+                    saveTasksSafely();
                     ui.showTaskAdded(task, tasks.size());
                 } catch (IllegalArgumentException exception) {
                     ui.showMessage(exception.getMessage());
@@ -108,7 +122,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         Task deletedTask = tasks.delete(index);
-                        saveTasksSafely(tasks, storage, ui);
+                        saveTasksSafely();
                         ui.showMessage("Noted. I've removed this task:");
                         ui.showMessage("  " + deletedTask);
                         ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
@@ -124,12 +138,17 @@ public class Pixel {
         }
     }
 
-    private static void saveTasksSafely(TaskList tasks, Storage storage, Ui ui) {
+    private void saveTasksSafely() {
         try {
             storage.save(tasks);
         } catch (IOException | SecurityException exception) {
             ui.showMessage("Oops! I couldn't save your tasks. "
                     + "Your changes will only last until Pixel exits.");
         }
+    }
+
+    /** Starts Pixel using the default relative, OS-independent data path. */
+    public static void main(String[] args) {
+        new Pixel(Path.of("data", "pixel.txt")).run();
     }
 }
