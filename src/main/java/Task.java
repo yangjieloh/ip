@@ -24,6 +24,15 @@ public class Task {
         isDone = false;
     }
 
+    /**
+     * Returns the representation used when saving this task to disk.
+     *
+     * @return Serialized task data.
+     */
+    public String toDataString() {
+        return "T | " + (isDone ? "1" : "0") + " | " + description;
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

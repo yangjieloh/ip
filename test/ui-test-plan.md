@@ -587,3 +587,76 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## UI-10: Save task changes to disk
+
+**Aim:** Verify that adding, marking, unmarking, and deleting typed tasks saves the resulting list to `data/pixel.txt` without changing console behavior.
+
+**Input commands:**
+
+```text
+todo alpha
+deadline beta /by Sunday
+event gamma /from Monday /to Tuesday
+mark 1
+unmark 1
+mark 2
+delete 3
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] beta (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] gamma (from: Monday to: Tuesday)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] alpha
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [T][ ] alpha
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] beta (by: Sunday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [E][ ] gamma (from: Monday to: Tuesday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file (`data/pixel.txt`):**
+
+```text
+T | 0 | alpha
+D | 1 | beta | Sunday
+```

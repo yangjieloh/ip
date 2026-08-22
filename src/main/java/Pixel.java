@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -5,7 +8,9 @@ import java.util.Scanner;
  * Starts the Pixel chatbot application.
  */
 public class Pixel {
-    public static void main(String[] args) {
+    private static final Path DATA_FILE = Path.of("data", "pixel.txt");
+
+    public static void main(String[] args) throws IOException {
         String banner = " ____  _          _ \n"
                 + "|  _ \\(_)_  _____| |\n"
                 + "| |_) | \\ \\/ / _ \\ |\n"
@@ -44,6 +49,7 @@ public class Pixel {
                         System.out.println("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsDone();
+                        saveTasks(tasks);
                         System.out.println("Nice! I've marked this task as done:");
                         System.out.println("  " + tasks.get(index));
                     }
@@ -59,6 +65,7 @@ public class Pixel {
                         System.out.println("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsNotDone();
+                        saveTasks(tasks);
                         System.out.println("OK, I've marked this task as not done yet:");
                         System.out.println("  " + tasks.get(index));
                     }
@@ -76,6 +83,7 @@ public class Pixel {
                     System.out.println(line);
                 } else {
                     tasks.add(new Todo(description));
+                    saveTasks(tasks);
                     printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                 }
             } else if (commandType == CommandType.DEADLINE) {
@@ -98,6 +106,7 @@ public class Pixel {
                         System.out.println(line);
                     } else {
                         tasks.add(new Deadline(description, by));
+                        saveTasks(tasks);
                         printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
@@ -123,6 +132,7 @@ public class Pixel {
                         System.out.println(line);
                     } else {
                         tasks.add(new Event(description, from, to));
+                        saveTasks(tasks);
                         printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
                     }
                 }
@@ -134,6 +144,7 @@ public class Pixel {
                         System.out.println("That task number does not exist.");
                     } else {
                         Task deletedTask = tasks.remove(index);
+                        saveTasks(tasks);
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("  " + deletedTask);
                         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -147,6 +158,21 @@ public class Pixel {
                 System.out.println(line);
             }
         }
+    }
+
+    /**
+     * Writes the current task list to the application's data file.
+     *
+     * @param tasks Tasks to save.
+     * @throws IOException If the data directory or file cannot be written.
+     */
+    public static void saveTasks(ArrayList<Task> tasks) throws IOException {
+        Files.createDirectories(DATA_FILE.getParent());
+        ArrayList<String> taskData = new ArrayList<>();
+        for (Task task : tasks) {
+            taskData.add(task.toDataString());
+        }
+        Files.write(DATA_FILE, taskData);
     }
 
     public static void printTaskAdded(Task task, int taskCount, String line) {
