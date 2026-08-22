@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
@@ -53,22 +52,8 @@ public class Pixel {
                 ui.showLine();
             } else if (commandType == CommandType.DATE) {
                 try {
-                    LocalDate date = parser.parseDate(command);
-                    boolean hasMatchingTask = false;
-                    for (int i = 0; i < tasks.size(); i++) {
-                        if (tasks.get(i).occursOn(date)) {
-                            if (!hasMatchingTask) {
-                                ui.showMessage("Here are the tasks occurring on "
-                                        + Deadline.formatDate(date) + ":");
-                            }
-                            ui.showMessage((i + 1) + "." + tasks.get(i));
-                            hasMatchingTask = true;
-                        }
-                    }
-                    if (!hasMatchingTask) {
-                        ui.showMessage("There are no tasks occurring on "
-                                + Deadline.formatDate(date) + ".");
-                    }
+                    Command dateCommand = new DateCommand(parser.parseDate(command));
+                    dateCommand.execute(tasks, ui, storage);
                 } catch (IllegalArgumentException exception) {
                     ui.showMessage(exception.getMessage());
                 }
