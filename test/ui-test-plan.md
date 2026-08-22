@@ -4,7 +4,9 @@ Run each test case in a fresh instance of `Pixel`. Output comparisons are exact 
 
 ## UI-00: Reject an empty ToDo and an unknown command
 
-**Aim:** Verify that a ToDo without a description and an unrecognized command produce the required error messages without being added as tasks.
+**Aim:** Verify that Pixel starts normally when no data file exists, and that a ToDo without a description and an unrecognized command produce the required error messages without being added as tasks.
+
+**Storage setup:** Ensure `data/pixel.txt` does not exist before starting Pixel.
 
 **Input commands:**
 
@@ -244,7 +246,7 @@ ____________________________________________________________
 Oops! Please specify the deadline using /by.
 ____________________________________________________________
 ____________________________________________________________
-Oops! Please specify the deadline using /by.
+Oops! The deadline description and date cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Oops! Please specify the event using /from and /to.
@@ -435,7 +437,7 @@ ____________________________________________________________
 Oops! Please give me a description and deadline.
 ____________________________________________________________
 ____________________________________________________________
-Oops! Please specify the deadline using /by.
+Oops! The deadline description and date cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Oops! Please give me an event description and time.
@@ -730,4 +732,297 @@ ____________________________________________________________
 ```text
 D | 1 | beta | Sunday
 E | 0 | gamma | Monday | Tuesday
+```
+
+## UI-12: Recover valid tasks from a partially corrupted file
+
+**Aim:** Verify that blank and malformed saved records are skipped with line-specific warnings while valid neighboring records remain usable and are cleaned into the next saved file.
+
+**Initial saved file (`data/pixel.txt`):**
+
+```text
+T | 1 | valid todo
+
+X | 0 | unknown
+D | 2 | invalid status | Sunday
+D | 0 | valid deadline | Friday
+E | 0 | missing end | Monday
+T | 0 | 
+E | 1 | valid event | Mon | Tue
+```
+
+**Input commands:**
+
+```text
+list
+todo recovered
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+Oops! I skipped invalid saved task on line 3: unknown task type 'X'.
+Oops! I skipped invalid saved task on line 4: status must be 0 or 1.
+Oops! I skipped invalid saved task on line 6: expected 5 fields but found 4.
+Oops! I skipped invalid saved task on line 7: task description cannot be empty.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] valid todo
+2.[D][ ] valid deadline (by: Friday)
+3.[E][X] valid event (from: Mon to: Tue)
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] recovered
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] valid todo
+2.[D][ ] valid deadline (by: Friday)
+3.[E][X] valid event (from: Mon to: Tue)
+4.[T][ ] recovered
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file (`data/pixel.txt`):**
+
+```text
+T | 1 | valid todo
+D | 0 | valid deadline | Friday
+E | 1 | valid event | Mon | Tue
+T | 0 | recovered
+```
+
+## UI-13: Round-trip storage separator characters
+
+**Aim:** Verify that literal pipe and backslash characters in saved fields load correctly and remain escaped after subsequent task changes.
+
+**Initial saved file (`data/pixel.txt`):**
+
+```text
+T | 0 | plan A \| plan B
+D | 1 | use C:\\temp | Friday \| evening
+E | 0 | sync \| review | Mon \\ morning | Tue \| night
+```
+
+**Input commands:**
+
+```text
+list
+mark 1
+delete 2
+todo path C:\work | docs
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] plan A | plan B
+2.[D][X] use C:\temp (by: Friday | evening)
+3.[E][ ] sync | review (from: Mon \ morning to: Tue | night)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] plan A | plan B
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [D][X] use C:\temp (by: Friday | evening)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] path C:\work | docs
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] plan A | plan B
+2.[E][ ] sync | review (from: Mon \ morning to: Tue | night)
+3.[T][ ] path C:\work | docs
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file (`data/pixel.txt`):**
+
+```text
+T | 1 | plan A \| plan B
+E | 0 | sync \| review | Mon \\ morning | Tue \| night
+T | 0 | path C:\\work \| docs
+```
+
+## UI-14: Recover from missing arguments and flexible whitespace
+
+**Aim:** Verify that leading/trailing whitespace, repeated delimiter whitespace, missing task numbers, and an overflowing task number are handled without corrupting the task list.
+
+**Input commands:**
+
+```text
+   todo alpha   
+mark
+unmark
+delete
+mark 999999999999999999999
+deadline beta   /by   Sunday
+event gamma   /from   Mon   /to   Tue
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after unmark.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after delete.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] beta (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] gamma (from: Mon to: Tue)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+2.[D][ ] beta (by: Sunday)
+3.[E][ ] gamma (from: Mon to: Tue)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-15: Recover when the save path cannot be read
+
+**Aim:** Verify that Pixel reports an unreadable save path, starts with a safe empty list, and remains usable.
+
+**Storage setup:** Create an empty directory at `data/pixel.txt` before starting Pixel.
+
+**Input commands:**
+
+```text
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't read the saved tasks. Starting with an empty list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-16: Keep working when task changes cannot be saved
+
+**Aim:** Verify that a write failure is reported while the in-memory task change remains available for the rest of the session.
+
+**Storage setup:** Create an empty directory at `data/pixel.txt.tmp` before starting Pixel so the temporary save file cannot be written.
+
+**Input commands:**
+
+```text
+todo unsaved
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Oops! I couldn't save your tasks. Your changes will only last until Pixel exits.
+Got it. I've added this task:
+  [T][ ] unsaved
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] unsaved
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
 ```

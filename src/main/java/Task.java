@@ -30,7 +30,7 @@ public class Task {
      * @return Serialized task data.
      */
     public String toDataString() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
+        return "T | " + (isDone ? "1" : "0") + " | " + escapeDataField(description);
     }
 
     /**
@@ -41,25 +41,82 @@ public class Task {
      */
     public static Task fromDataString(String data) {
         String[] fields = data.split(" \\| ", -1);
+        if (fields.length < 2) {
+            throw new IllegalArgumentException("task type or status is missing.");
+        }
+        if (!fields[1].equals("0") && !fields[1].equals("1")) {
+            throw new IllegalArgumentException("status must be 0 or 1.");
+        }
+
         Task task;
         switch (fields[0]) {
         case "T":
-            task = new Todo(fields[2]);
+            requireFieldCount(fields, 3);
+            requireNonEmpty(fields[2], "task description");
+            task = new Todo(unescapeDataField(fields[2]));
             break;
         case "D":
-            task = new Deadline(fields[2], fields[3]);
+            requireFieldCount(fields, 4);
+            requireNonEmpty(fields[2], "task description");
+            requireNonEmpty(fields[3], "deadline");
+            task = new Deadline(unescapeDataField(fields[2]), unescapeDataField(fields[3]));
             break;
         case "E":
-            task = new Event(fields[2], fields[3], fields[4]);
+            requireFieldCount(fields, 5);
+            requireNonEmpty(fields[2], "task description");
+            requireNonEmpty(fields[3], "event start time");
+            requireNonEmpty(fields[4], "event end time");
+            task = new Event(unescapeDataField(fields[2]), unescapeDataField(fields[3]),
+                    unescapeDataField(fields[4]));
             break;
         default:
-            throw new IllegalArgumentException("Unknown task type: " + fields[0]);
+            throw new IllegalArgumentException("unknown task type '" + fields[0] + "'.");
         }
 
         if (fields[1].equals("1")) {
             task.markAsDone();
         }
         return task;
+    }
+
+    /** Validates that a saved record has exactly the fields required by its task type. */
+    private static void requireFieldCount(String[] fields, int expectedCount) {
+        if (fields.length != expectedCount) {
+            throw new IllegalArgumentException("expected " + expectedCount
+                    + " fields but found " + fields.length + ".");
+        }
+    }
+
+    /** Validates that a required saved field contains visible or non-whitespace text. */
+    private static void requireNonEmpty(String field, String fieldName) {
+        if (field.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " cannot be empty.");
+        }
+    }
+
+    /** Escapes characters that have structural meaning in the save-file format. */
+    protected static String escapeDataField(String field) {
+        return field.replace("\\", "\\\\").replace("|", "\\|");
+    }
+
+    /**
+     * Restores escaped separators and backslashes from a saved field.
+     * Unknown and trailing backslashes are preserved for compatibility with files
+     * written before escaping was introduced.
+     */
+    private static String unescapeDataField(String field) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < field.length(); i++) {
+            char character = field.charAt(i);
+            if (character == '\\' && i + 1 < field.length()
+                    && (field.charAt(i + 1) == '\\' || field.charAt(i + 1) == '|')) {
+                result.append(field.charAt(i + 1));
+                i++;
+            } else {
+                result.append(character);
+            }
+        }
+        return result.toString();
     }
 
     @Override
