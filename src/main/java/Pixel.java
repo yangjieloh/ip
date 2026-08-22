@@ -36,15 +36,17 @@ public class Pixel {
             ui.showLine();
         }
 
-        while (ui.hasNextCommand()) {
+        boolean isExit = false;
+        while (!isExit && ui.hasNextCommand()) {
             String command = ui.readCommand();
             CommandType commandType = parser.parseCommandType(command);
             ui.showLine();
 
             if (commandType == CommandType.BYE) {
-                ui.showMessage("Bye. Hope to see you again soon!");
+                Command exitCommand = new ExitCommand();
+                exitCommand.execute(tasks, ui, storage);
+                isExit = exitCommand.isExit();
                 ui.showLine();
-                break;
             } else if (commandType == CommandType.LIST) {
                 ui.showMessage("Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
