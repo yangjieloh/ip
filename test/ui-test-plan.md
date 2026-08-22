@@ -660,3 +660,74 @@ ____________________________________________________________
 T | 0 | alpha
 D | 1 | beta | Sunday
 ```
+
+## UI-11: Load tasks and continue saving changes
+
+**Aim:** Verify that Pixel restores ToDos, Deadlines, Events, and their done statuses at startup, then correctly saves later changes to those loaded tasks.
+
+**Initial saved file (`data/pixel.txt`):**
+
+```text
+T | 1 | alpha
+D | 0 | beta | Sunday
+E | 1 | gamma | Monday | Tuesday
+```
+
+**Input commands:**
+
+```text
+list
+mark 2
+unmark 3
+delete 1
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] alpha
+2.[D][ ] beta (by: Sunday)
+3.[E][X] gamma (from: Monday to: Tuesday)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] beta (by: Sunday)
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [E][ ] gamma (from: Monday to: Tuesday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][X] alpha
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][X] beta (by: Sunday)
+2.[E][ ] gamma (from: Monday to: Tuesday)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file (`data/pixel.txt`):**
+
+```text
+D | 1 | beta | Sunday
+E | 0 | gamma | Monday | Tuesday
+```

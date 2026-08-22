@@ -23,7 +23,7 @@ public class Pixel {
         System.out.println("What can I do for you?");
         System.out.println(line);
 
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = loadTasks();
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNextLine()) {
@@ -173,6 +173,24 @@ public class Pixel {
             taskData.add(task.toDataString());
         }
         Files.write(DATA_FILE, taskData);
+    }
+
+    /**
+     * Loads saved tasks, or returns an empty list when no data file exists yet.
+     *
+     * @return Tasks restored from the data file.
+     * @throws IOException If an existing data file cannot be read.
+     */
+    public static ArrayList<Task> loadTasks() throws IOException {
+        ArrayList<Task> tasks = new ArrayList<>();
+        if (!Files.exists(DATA_FILE)) {
+            return tasks;
+        }
+
+        for (String taskData : Files.readAllLines(DATA_FILE)) {
+            tasks.add(Task.fromDataString(taskData));
+        }
+        return tasks;
     }
 
     public static void printTaskAdded(Task task, int taskCount, String line) {

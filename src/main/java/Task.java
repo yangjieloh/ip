@@ -33,6 +33,35 @@ public class Task {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
+    /**
+     * Recreates a task from one line of saved data.
+     *
+     * @param data Serialized task data.
+     * @return Task represented by the saved data.
+     */
+    public static Task fromDataString(String data) {
+        String[] fields = data.split(" \\| ", -1);
+        Task task;
+        switch (fields[0]) {
+        case "T":
+            task = new Todo(fields[2]);
+            break;
+        case "D":
+            task = new Deadline(fields[2], fields[3]);
+            break;
+        case "E":
+            task = new Event(fields[2], fields[3], fields[4]);
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown task type: " + fields[0]);
+        }
+
+        if (fields[1].equals("1")) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
