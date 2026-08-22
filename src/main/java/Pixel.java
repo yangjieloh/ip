@@ -14,7 +14,7 @@ public class Pixel {
         ui.showWelcome();
 
         ArrayList<String> loadWarnings = new ArrayList<>();
-        ArrayList<Task> tasks = storage.load(loadWarnings);
+        TaskList tasks = new TaskList(storage.load(loadWarnings));
         for (String warning : loadWarnings) {
             ui.showMessage(warning);
         }
@@ -64,10 +64,10 @@ public class Pixel {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(4).trim());
                     int index = taskNumber - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                    if (!tasks.isValidIndex(index)) {
                         ui.showMessage("That task number does not exist.");
                     } else {
-                        tasks.get(index).markAsDone();
+                        tasks.markAsDone(index);
                         saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("Nice! I've marked this task as done:");
                         ui.showMessage("  " + tasks.get(index));
@@ -80,10 +80,10 @@ public class Pixel {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(6).trim());
                     int index = taskNumber - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                    if (!tasks.isValidIndex(index)) {
                         ui.showMessage("That task number does not exist.");
                     } else {
-                        tasks.get(index).markAsNotDone();
+                        tasks.markAsNotDone(index);
                         saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("OK, I've marked this task as not done yet:");
                         ui.showMessage("  " + tasks.get(index));
@@ -101,9 +101,10 @@ public class Pixel {
                     ui.showMessage("Oops! Please give me a description for the todo.");
                     ui.showLine();
                 } else {
-                    tasks.add(new Todo(description));
+                    Task task = new Todo(description);
+                    tasks.add(task);
                     saveTasksSafely(tasks, storage, ui);
-                    ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                    ui.showTaskAdded(task, tasks.size());
                 }
             } else if (commandType == CommandType.DEADLINE) {
                 String details = "";
@@ -126,9 +127,10 @@ public class Pixel {
                     } else {
                         try {
                             LocalDate by = LocalDate.parse(byString);
-                            tasks.add(new Deadline(description, by));
+                            Task task = new Deadline(description, by);
+                            tasks.add(task);
                             saveTasksSafely(tasks, storage, ui);
-                            ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                            ui.showTaskAdded(task, tasks.size());
                         } catch (DateTimeParseException exception) {
                             ui.showMessage("Oops! Please enter the deadline date "
                                     + "in YYYY-MM-DD format.");
@@ -158,20 +160,21 @@ public class Pixel {
                         ui.showMessage("Oops! The event description and times cannot be empty.");
                         ui.showLine();
                     } else {
-                        tasks.add(new Event(fromParts[0].trim(), toParts[0].trim(),
-                                toParts[1].trim()));
+                        Task task = new Event(fromParts[0].trim(), toParts[0].trim(),
+                                toParts[1].trim());
+                        tasks.add(task);
                         saveTasksSafely(tasks, storage, ui);
-                        ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                        ui.showTaskAdded(task, tasks.size());
                     }
                 }
             } else if (commandType == CommandType.DELETE) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(6).trim());
                     int index = taskNumber - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                    if (!tasks.isValidIndex(index)) {
                         ui.showMessage("That task number does not exist.");
                     } else {
-                        Task deletedTask = tasks.remove(index);
+                        Task deletedTask = tasks.delete(index);
                         saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("Noted. I've removed this task:");
                         ui.showMessage("  " + deletedTask);
@@ -188,7 +191,7 @@ public class Pixel {
         }
     }
 
-    private static void saveTasksSafely(ArrayList<Task> tasks, Storage storage, Ui ui) {
+    private static void saveTasksSafely(TaskList tasks, Storage storage, Ui ui) {
         try {
             storage.save(tasks);
         } catch (IOException | SecurityException exception) {

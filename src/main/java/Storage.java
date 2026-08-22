@@ -29,15 +29,15 @@ public class Storage {
      * @param tasks Tasks to save.
      * @throws IOException If the data directory or file cannot be written.
      */
-    public void save(List<Task> tasks) throws IOException {
+    public void save(TaskList tasks) throws IOException {
         Path parentDirectory = filePath.getParent();
         if (parentDirectory != null) {
             Files.createDirectories(parentDirectory);
         }
 
         ArrayList<String> taskData = new ArrayList<>();
-        for (Task task : tasks) {
-            taskData.add(task.toDataString());
+        for (int i = 0; i < tasks.size(); i++) {
+            taskData.add(tasks.get(i).toDataString());
         }
 
         Path temporaryFile = filePath.resolveSibling(filePath.getFileName() + ".tmp");
