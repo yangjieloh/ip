@@ -1,10 +1,5 @@
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -13,14 +8,13 @@ import java.util.ArrayList;
  * Starts the Pixel chatbot application.
  */
 public class Pixel {
-    private static final Path DATA_FILE = Path.of("data", "pixel.txt");
-
     public static void main(String[] args) {
         Ui ui = new Ui();
+        Storage storage = new Storage(Path.of("data", "pixel.txt"));
         ui.showWelcome();
 
         ArrayList<String> loadWarnings = new ArrayList<>();
-        ArrayList<Task> tasks = loadTasks(loadWarnings);
+        ArrayList<Task> tasks = storage.load(loadWarnings);
         for (String warning : loadWarnings) {
             ui.showMessage(warning);
         }
@@ -74,7 +68,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsDone();
-                        saveTasksSafely(tasks, ui);
+                        saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("Nice! I've marked this task as done:");
                         ui.showMessage("  " + tasks.get(index));
                     }
@@ -90,7 +84,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsNotDone();
-                        saveTasksSafely(tasks, ui);
+                        saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("OK, I've marked this task as not done yet:");
                         ui.showMessage("  " + tasks.get(index));
                     }
@@ -108,7 +102,7 @@ public class Pixel {
                     ui.showLine();
                 } else {
                     tasks.add(new Todo(description));
-                    saveTasksSafely(tasks, ui);
+                    saveTasksSafely(tasks, storage, ui);
                     ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                 }
             } else if (commandType == CommandType.DEADLINE) {
@@ -133,7 +127,7 @@ public class Pixel {
                         try {
                             LocalDate by = LocalDate.parse(byString);
                             tasks.add(new Deadline(description, by));
-                            saveTasksSafely(tasks, ui);
+                            saveTasksSafely(tasks, storage, ui);
                             ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         } catch (DateTimeParseException exception) {
                             ui.showMessage("Oops! Please enter the deadline date "
@@ -166,7 +160,7 @@ public class Pixel {
                     } else {
                         tasks.add(new Event(fromParts[0].trim(), toParts[0].trim(),
                                 toParts[1].trim()));
-                        saveTasksSafely(tasks, ui);
+                        saveTasksSafely(tasks, storage, ui);
                         ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 }
@@ -178,7 +172,7 @@ public class Pixel {
                         ui.showMessage("That task number does not exist.");
                     } else {
                         Task deletedTask = tasks.remove(index);
-                        saveTasksSafely(tasks, ui);
+                        saveTasksSafely(tasks, storage, ui);
                         ui.showMessage("Noted. I've removed this task:");
                         ui.showMessage("  " + deletedTask);
                         ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
@@ -194,68 +188,12 @@ public class Pixel {
         }
     }
 
-    /**
-     * Writes the current task list to the application's data file.
-     *
-     * @param tasks Tasks to save.
-     * @throws IOException If the data directory or file cannot be written.
-     */
-    public static void saveTasks(ArrayList<Task> tasks) throws IOException {
-        Files.createDirectories(DATA_FILE.getParent());
-        ArrayList<String> taskData = new ArrayList<>();
-        for (Task task : tasks) {
-            taskData.add(task.toDataString());
-        }
-        Path temporaryFile = DATA_FILE.resolveSibling(DATA_FILE.getFileName() + ".tmp");
-        Files.write(temporaryFile, taskData, StandardCharsets.UTF_8);
+    private static void saveTasksSafely(ArrayList<Task> tasks, Storage storage, Ui ui) {
         try {
-            Files.move(temporaryFile, DATA_FILE, StandardCopyOption.REPLACE_EXISTING,
-                    StandardCopyOption.ATOMIC_MOVE);
-        } catch (AtomicMoveNotSupportedException exception) {
-            Files.move(temporaryFile, DATA_FILE, StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
-
-    private static void saveTasksSafely(ArrayList<Task> tasks, Ui ui) {
-        try {
-            saveTasks(tasks);
+            storage.save(tasks);
         } catch (IOException | SecurityException exception) {
             ui.showMessage("Oops! I couldn't save your tasks. "
                     + "Your changes will only last until Pixel exits.");
         }
     }
-
-    /**
-     * Loads saved tasks, or returns an empty list when no data file exists yet.
-     *
-     * @param warnings Messages describing records that could not be loaded.
-     * @return Valid tasks restored from the data file.
-     */
-    public static ArrayList<Task> loadTasks(ArrayList<String> warnings) {
-        ArrayList<Task> tasks = new ArrayList<>();
-        ArrayList<String> savedLines;
-        try {
-            savedLines = new ArrayList<>(Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8));
-        } catch (NoSuchFileException exception) {
-            return tasks;
-        } catch (IOException | SecurityException exception) {
-            warnings.add("Oops! I couldn't read the saved tasks. Starting with an empty list.");
-            return tasks;
-        }
-
-        for (int i = 0; i < savedLines.size(); i++) {
-            String taskData = savedLines.get(i);
-            if (taskData.isBlank()) {
-                continue;
-            }
-            try {
-                tasks.add(Task.fromDataString(taskData));
-            } catch (IllegalArgumentException exception) {
-                warnings.add("Oops! I skipped invalid saved task on line " + (i + 1)
-                        + ": " + exception.getMessage());
-            }
-        }
-        return tasks;
-    }
-
 }

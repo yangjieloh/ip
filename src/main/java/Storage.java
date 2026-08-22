@@ -1,0 +1,86 @@
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Loads tasks from and saves tasks to the application's data file.
+ */
+public class Storage {
+    private final Path filePath;
+
+    /**
+     * Creates storage that uses the specified data file.
+     *
+     * @param filePath Relative or absolute path to the data file.
+     */
+    public Storage(Path filePath) {
+        this.filePath = filePath;
+    }
+
+    /**
+     * Writes the current task list to the data file.
+     *
+     * @param tasks Tasks to save.
+     * @throws IOException If the data directory or file cannot be written.
+     */
+    public void save(List<Task> tasks) throws IOException {
+        Path parentDirectory = filePath.getParent();
+        if (parentDirectory != null) {
+            Files.createDirectories(parentDirectory);
+        }
+
+        ArrayList<String> taskData = new ArrayList<>();
+        for (Task task : tasks) {
+            taskData.add(task.toDataString());
+        }
+
+        Path temporaryFile = filePath.resolveSibling(filePath.getFileName() + ".tmp");
+        Files.write(temporaryFile, taskData, StandardCharsets.UTF_8);
+        try {
+            Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException exception) {
+            Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    /**
+     * Loads saved tasks, or returns an empty list when no data file exists yet.
+     * Invalid records are skipped and described in {@code warnings}.
+     *
+     * @param warnings Messages describing records that could not be loaded.
+     * @return Valid tasks restored from the data file.
+     */
+    public ArrayList<Task> load(List<String> warnings) {
+        ArrayList<Task> tasks = new ArrayList<>();
+        List<String> savedLines;
+        try {
+            savedLines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+        } catch (NoSuchFileException exception) {
+            return tasks;
+        } catch (IOException | SecurityException exception) {
+            warnings.add("Oops! I couldn't read the saved tasks. Starting with an empty list.");
+            return tasks;
+        }
+
+        for (int i = 0; i < savedLines.size(); i++) {
+            String taskData = savedLines.get(i);
+            if (taskData.isBlank()) {
+                continue;
+            }
+            try {
+                tasks.add(Task.fromDataString(taskData));
+            } catch (IllegalArgumentException exception) {
+                warnings.add("Oops! I skipped invalid saved task on line " + (i + 1)
+                        + ": " + exception.getMessage());
+            }
+        }
+        return tasks;
+    }
+}
