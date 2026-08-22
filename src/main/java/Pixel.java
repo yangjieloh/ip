@@ -48,10 +48,8 @@ public class Pixel {
                 isExit = exitCommand.isExit();
                 ui.showLine();
             } else if (commandType == CommandType.LIST) {
-                ui.showMessage("Here are the tasks in your list:");
-                for (int i = 0; i < tasks.size(); i++) {
-                    ui.showMessage((i + 1) + "." + tasks.get(i));
-                }
+                Command listCommand = new ListCommand();
+                listCommand.execute(tasks, ui, storage);
                 ui.showLine();
             } else if (commandType == CommandType.DATE) {
                 try {
@@ -134,7 +132,8 @@ public class Pixel {
                 }
                 ui.showLine();
             } else {
-                ui.showMessage("Sorry, I don't recognise that command.");
+                Command unknownCommand = new UnknownCommand();
+                unknownCommand.execute(tasks, ui, storage);
                 ui.showLine();
             }
         }
