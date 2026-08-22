@@ -23,19 +23,34 @@ public enum CommandType {
             return BYE;
         } else if (command.equals("list")) {
             return LIST;
-        } else if (command.startsWith("mark ")) {
+        } else if (hasKeyword(command, "mark")) {
             return MARK;
-        } else if (command.startsWith("unmark ")) {
+        } else if (hasKeyword(command, "unmark")) {
             return UNMARK;
-        } else if (command.equals("todo") || command.startsWith("todo ")) {
+        } else if (hasKeyword(command, "todo")) {
             return TODO;
-        } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+        } else if (hasKeyword(command, "deadline")) {
             return DEADLINE;
-        } else if (command.equals("event") || command.startsWith("event ")) {
+        } else if (hasKeyword(command, "event")) {
             return EVENT;
-        } else if (command.startsWith("delete ")) {
+        } else if (hasKeyword(command, "delete")) {
             return DELETE;
         }
         return UNKNOWN;
+    }
+
+    /**
+     * Checks for a command keyword followed by either nothing or whitespace.
+     * This prevents inputs such as {@code todoList} from being treated as {@code todo}.
+     *
+     * @param command Full command entered by the user.
+     * @param keyword Keyword to find at the start of the command.
+     * @return Whether the command starts with the complete keyword.
+     */
+    private static boolean hasKeyword(String command, String keyword) {
+        return command.equals(keyword)
+                || command.length() > keyword.length()
+                && command.startsWith(keyword)
+                && Character.isWhitespace(command.charAt(keyword.length()));
     }
 }
