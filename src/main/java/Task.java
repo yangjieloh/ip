@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 /**
  * Represents a task and whether it has been completed.
  */
@@ -59,7 +62,7 @@ public class Task {
             requireFieldCount(fields, 4);
             requireNonEmpty(fields[2], "task description");
             requireNonEmpty(fields[3], "deadline");
-            task = new Deadline(unescapeDataField(fields[2]), unescapeDataField(fields[3]));
+            task = new Deadline(unescapeDataField(fields[2]), parseDeadline(fields[3]));
             break;
         case "E":
             requireFieldCount(fields, 5);
@@ -77,6 +80,22 @@ public class Task {
             task.markAsDone();
         }
         return task;
+    }
+
+    /**
+     * Parses an ISO deadline stored in a saved task record.
+     *
+     * @param field Escaped deadline field from the data file.
+     * @return Parsed deadline.
+     * @throws IllegalArgumentException If the field is not a valid ISO date.
+     */
+    private static LocalDate parseDeadline(String field) {
+        try {
+            return LocalDate.parse(unescapeDataField(field));
+        } catch (DateTimeParseException exception) {
+            throw new IllegalArgumentException(
+                    "deadline must be a valid date in YYYY-MM-DD format.", exception);
+        }
     }
 
     /** Validates that a saved record has exactly the fields required by its task type. */

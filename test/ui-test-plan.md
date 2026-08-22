@@ -147,13 +147,13 @@ ____________________________________________________________
 
 ## UI-03: Add and manage typed tasks
 
-**Aim:** Verify that Pixel adds ToDos, Deadlines, and Events; treats date/time values as strings; lists each task with its type icon; and preserves typed-task formatting when marking and unmarking.
+**Aim:** Verify that Pixel stores Deadline dates in ISO format, displays them as `MMM dd yyyy`, and preserves typed-task formatting when marking and unmarking.
 
 **Input commands:**
 
 ```text
 todo borrow book
-deadline do homework /by no idea :-p
+deadline do homework /by 2019-12-02
 event project meeting /from Mon 2pm /to 4pm
 mark 2
 list
@@ -181,7 +181,7 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] do homework (by: no idea :-p)
+  [D][ ] do homework (by: Dec 02 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -191,22 +191,22 @@ Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] do homework (by: no idea :-p)
+  [D][X] do homework (by: Dec 02 2019)
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] borrow book
-2.[D][X] do homework (by: no idea :-p)
+2.[D][X] do homework (by: Dec 02 2019)
 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
 OK, I've marked this task as not done yet:
-  [D][ ] do homework (by: no idea :-p)
+  [D][ ] do homework (by: Dec 02 2019)
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] borrow book
-2.[D][ ] do homework (by: no idea :-p)
+2.[D][ ] do homework (by: Dec 02 2019)
 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
@@ -270,14 +270,15 @@ ____________________________________________________________
 
 ## UI-05: Preserve task state across rejected creation commands
 
-**Aim:** Verify that invalid Deadline, Event, and unknown commands interleaved with valid additions neither create tasks nor disturb task order.
+**Aim:** Verify that missing and invalid Deadline data, malformed Events, and unknown commands interleaved with valid additions neither create tasks nor disturb task order.
 
 **Input commands:**
 
 ```text
 todo alpha
 deadline missing deadline
-deadline beta /by Sunday
+deadline impossible /by 2023-02-29
+deadline beta /by 2026-08-23
 event broken /from /to Friday
 event gamma /from Monday /to Tuesday
 blah
@@ -306,8 +307,11 @@ ____________________________________________________________
 Oops! Please specify the deadline using /by.
 ____________________________________________________________
 ____________________________________________________________
+Oops! Please enter the deadline date in YYYY-MM-DD format.
+____________________________________________________________
+____________________________________________________________
 Got it. I've added this task:
-  [D][ ] beta (by: Sunday)
+  [D][ ] beta (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -324,7 +328,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] alpha
-2.[D][ ] beta (by: Sunday)
+2.[D][ ] beta (by: Aug 23 2026)
 3.[E][ ] gamma (from: Monday to: Tuesday)
 ____________________________________________________________
 ____________________________________________________________
@@ -470,7 +474,7 @@ ____________________________________________________________
 
 ```text
 todo alpha
-deadline beta /by Sunday
+deadline beta /by 2026-08-23
 event gamma /from Monday /to Tuesday
 mark 2
 delete 2
@@ -499,7 +503,7 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] beta (by: Sunday)
+  [D][ ] beta (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -509,11 +513,11 @@ Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] beta (by: Sunday)
+  [D][X] beta (by: Aug 23 2026)
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
-  [D][X] beta (by: Sunday)
+  [D][X] beta (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -598,7 +602,7 @@ ____________________________________________________________
 
 ```text
 todo alpha
-deadline beta /by Sunday
+deadline beta /by 2026-08-23
 event gamma /from Monday /to Tuesday
 mark 1
 unmark 1
@@ -626,7 +630,7 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] beta (by: Sunday)
+  [D][ ] beta (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -644,7 +648,7 @@ OK, I've marked this task as not done yet:
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] beta (by: Sunday)
+  [D][X] beta (by: Aug 23 2026)
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
@@ -660,7 +664,7 @@ ____________________________________________________________
 
 ```text
 T | 0 | alpha
-D | 1 | beta | Sunday
+D | 1 | beta | 2026-08-23
 ```
 
 ## UI-11: Load tasks and continue saving changes
@@ -671,7 +675,7 @@ D | 1 | beta | Sunday
 
 ```text
 T | 1 | alpha
-D | 0 | beta | Sunday
+D | 0 | beta | 2026-08-23
 E | 1 | gamma | Monday | Tuesday
 ```
 
@@ -701,12 +705,12 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] alpha
-2.[D][ ] beta (by: Sunday)
+2.[D][ ] beta (by: Aug 23 2026)
 3.[E][X] gamma (from: Monday to: Tuesday)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] beta (by: Sunday)
+  [D][X] beta (by: Aug 23 2026)
 ____________________________________________________________
 ____________________________________________________________
 OK, I've marked this task as not done yet:
@@ -719,7 +723,7 @@ Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[D][X] beta (by: Sunday)
+1.[D][X] beta (by: Aug 23 2026)
 2.[E][ ] gamma (from: Monday to: Tuesday)
 ____________________________________________________________
 ____________________________________________________________
@@ -730,7 +734,7 @@ ____________________________________________________________
 **Expected saved file (`data/pixel.txt`):**
 
 ```text
-D | 1 | beta | Sunday
+D | 1 | beta | 2026-08-23
 E | 0 | gamma | Monday | Tuesday
 ```
 
@@ -745,7 +749,8 @@ T | 1 | valid todo
 
 X | 0 | unknown
 D | 2 | invalid status | Sunday
-D | 0 | valid deadline | Friday
+D | 0 | invalid date | Friday
+D | 0 | valid deadline | 2026-08-23
 E | 0 | missing end | Monday
 T | 0 | 
 E | 1 | valid event | Mon | Tue
@@ -774,13 +779,14 @@ What can I do for you?
 ____________________________________________________________
 Oops! I skipped invalid saved task on line 3: unknown task type 'X'.
 Oops! I skipped invalid saved task on line 4: status must be 0 or 1.
-Oops! I skipped invalid saved task on line 6: expected 5 fields but found 4.
-Oops! I skipped invalid saved task on line 7: task description cannot be empty.
+Oops! I skipped invalid saved task on line 5: deadline must be a valid date in YYYY-MM-DD format.
+Oops! I skipped invalid saved task on line 7: expected 5 fields but found 4.
+Oops! I skipped invalid saved task on line 8: task description cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] valid todo
-2.[D][ ] valid deadline (by: Friday)
+2.[D][ ] valid deadline (by: Aug 23 2026)
 3.[E][X] valid event (from: Mon to: Tue)
 ____________________________________________________________
 ____________________________________________________________
@@ -791,7 +797,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] valid todo
-2.[D][ ] valid deadline (by: Friday)
+2.[D][ ] valid deadline (by: Aug 23 2026)
 3.[E][X] valid event (from: Mon to: Tue)
 4.[T][ ] recovered
 ____________________________________________________________
@@ -804,7 +810,7 @@ ____________________________________________________________
 
 ```text
 T | 1 | valid todo
-D | 0 | valid deadline | Friday
+D | 0 | valid deadline | 2026-08-23
 E | 1 | valid event | Mon | Tue
 T | 0 | recovered
 ```
@@ -817,7 +823,7 @@ T | 0 | recovered
 
 ```text
 T | 0 | plan A \| plan B
-D | 1 | use C:\\temp | Friday \| evening
+D | 1 | use C:\\temp | 2026-08-23
 E | 0 | sync \| review | Mon \\ morning | Tue \| night
 ```
 
@@ -847,7 +853,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] plan A | plan B
-2.[D][X] use C:\temp (by: Friday | evening)
+2.[D][X] use C:\temp (by: Aug 23 2026)
 3.[E][ ] sync | review (from: Mon \ morning to: Tue | night)
 ____________________________________________________________
 ____________________________________________________________
@@ -856,7 +862,7 @@ Nice! I've marked this task as done:
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
-  [D][X] use C:\temp (by: Friday | evening)
+  [D][X] use C:\temp (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -895,7 +901,7 @@ mark
 unmark
 delete
 mark 999999999999999999999
-deadline beta   /by   Sunday
+deadline beta   /by   2026-08-23
 event gamma   /from   Mon   /to   Tue
 list
 bye
@@ -932,7 +938,7 @@ Please specify a valid task number after mark.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] beta (by: Sunday)
+  [D][ ] beta (by: Aug 23 2026)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -943,7 +949,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] alpha
-2.[D][ ] beta (by: Sunday)
+2.[D][ ] beta (by: Aug 23 2026)
 3.[E][ ] gamma (from: Mon to: Tue)
 ____________________________________________________________
 ____________________________________________________________
