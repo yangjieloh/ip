@@ -8,7 +8,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Starts the Pixel chatbot application.
@@ -17,43 +16,33 @@ public class Pixel {
     private static final Path DATA_FILE = Path.of("data", "pixel.txt");
 
     public static void main(String[] args) {
-        String banner = " ____  _          _ \n"
-                + "|  _ \\(_)_  _____| |\n"
-                + "| |_) | \\ \\/ / _ \\ |\n"
-                + "|  __/| |>  <  __/ |\n"
-                + "|_|   |_/_/\\_\\___|_|";
-        String line = "____________________________________________________________";
-        System.out.println(line);
-        System.out.println(banner);
-        System.out.println("Hello! I'm Pixel.");
-        System.out.println("What can I do for you?");
-        System.out.println(line);
+        Ui ui = new Ui();
+        ui.showWelcome();
 
         ArrayList<String> loadWarnings = new ArrayList<>();
         ArrayList<Task> tasks = loadTasks(loadWarnings);
         for (String warning : loadWarnings) {
-            System.out.println(warning);
+            ui.showMessage(warning);
         }
         if (!loadWarnings.isEmpty()) {
-            System.out.println(line);
+            ui.showLine();
         }
-        Scanner scanner = new Scanner(System.in);
 
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().trim();
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
             CommandType commandType = CommandType.fromCommand(command);
-            System.out.println(line);
+            ui.showLine();
 
             if (commandType == CommandType.BYE) {
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(line);
+                ui.showMessage("Bye. Hope to see you again soon!");
+                ui.showLine();
                 break;
             } else if (commandType == CommandType.LIST) {
-                System.out.println("Here are the tasks in your list:");
+                ui.showMessage("Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println((i + 1) + "." + tasks.get(i));
+                    ui.showMessage((i + 1) + "." + tasks.get(i));
                 }
-                System.out.println(line);
+                ui.showLine();
             } else if (commandType == CommandType.DATE) {
                 try {
                     LocalDate date = LocalDate.parse(command.substring(4).trim());
@@ -61,66 +50,66 @@ public class Pixel {
                     for (int i = 0; i < tasks.size(); i++) {
                         if (tasks.get(i).occursOn(date)) {
                             if (!hasMatchingTask) {
-                                System.out.println("Here are the tasks occurring on "
+                                ui.showMessage("Here are the tasks occurring on "
                                         + Deadline.formatDate(date) + ":");
                             }
-                            System.out.println((i + 1) + "." + tasks.get(i));
+                            ui.showMessage((i + 1) + "." + tasks.get(i));
                             hasMatchingTask = true;
                         }
                     }
                     if (!hasMatchingTask) {
-                        System.out.println("There are no tasks occurring on "
+                        ui.showMessage("There are no tasks occurring on "
                                 + Deadline.formatDate(date) + ".");
                     }
                 } catch (DateTimeParseException exception) {
-                    System.out.println("Oops! Please enter a valid date after date "
+                    ui.showMessage("Oops! Please enter a valid date after date "
                             + "in YYYY-MM-DD format.");
                 }
-                System.out.println(line);
+                ui.showLine();
             } else if (commandType == CommandType.MARK) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(4).trim());
                     int index = taskNumber - 1;
                     if (index < 0 || index >= tasks.size()) {
-                        System.out.println("That task number does not exist.");
+                        ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsDone();
-                        saveTasksSafely(tasks);
-                        System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + tasks.get(index));
+                        saveTasksSafely(tasks, ui);
+                        ui.showMessage("Nice! I've marked this task as done:");
+                        ui.showMessage("  " + tasks.get(index));
                     }
                 } catch (NumberFormatException exception) {
-                    System.out.println("Please specify a valid task number after mark.");
+                    ui.showMessage("Please specify a valid task number after mark.");
                 }
-                System.out.println(line);
+                ui.showLine();
             } else if (commandType == CommandType.UNMARK) {
                 try {
                     int taskNumber = Integer.parseInt(command.substring(6).trim());
                     int index = taskNumber - 1;
                     if (index < 0 || index >= tasks.size()) {
-                        System.out.println("That task number does not exist.");
+                        ui.showMessage("That task number does not exist.");
                     } else {
                         tasks.get(index).markAsNotDone();
-                        saveTasksSafely(tasks);
-                        System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + tasks.get(index));
+                        saveTasksSafely(tasks, ui);
+                        ui.showMessage("OK, I've marked this task as not done yet:");
+                        ui.showMessage("  " + tasks.get(index));
                     }
                 } catch (NumberFormatException exception) {
-                    System.out.println("Please specify a valid task number after unmark.");
+                    ui.showMessage("Please specify a valid task number after unmark.");
                 }
-                System.out.println(line);
+                ui.showLine();
             } else if (commandType == CommandType.TODO) {
                 String description = "";
                 if (command.length() > 4) {
                     description = command.substring(4).trim();
                 }
                 if (description.isEmpty()) {
-                    System.out.println("Oops! Please give me a description for the todo.");
-                    System.out.println(line);
+                    ui.showMessage("Oops! Please give me a description for the todo.");
+                    ui.showLine();
                 } else {
                     tasks.add(new Todo(description));
-                    saveTasksSafely(tasks);
-                    printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
+                    saveTasksSafely(tasks, ui);
+                    ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                 }
             } else if (commandType == CommandType.DEADLINE) {
                 String details = "";
@@ -128,28 +117,28 @@ public class Pixel {
                     details = command.substring(8).trim();
                 }
                 if (details.isEmpty()) {
-                    System.out.println("Oops! Please give me a description and deadline.");
-                    System.out.println(line);
+                    ui.showMessage("Oops! Please give me a description and deadline.");
+                    ui.showLine();
                 } else if (!details.matches("(?s).*(?:^|\\s)/by(?:\\s+.*|$)")) {
-                    System.out.println("Oops! Please specify the deadline using /by.");
-                    System.out.println(line);
+                    ui.showMessage("Oops! Please specify the deadline using /by.");
+                    ui.showLine();
                 } else {
                     String[] parts = details.split("(?:^|\\s+)/by(?=\\s|$)", 2);
                     String description = parts[0].trim();
                     String byString = parts[1].trim();
                     if (description.isEmpty() || byString.isEmpty()) {
-                        System.out.println("Oops! The deadline description and date cannot be empty.");
-                        System.out.println(line);
+                        ui.showMessage("Oops! The deadline description and date cannot be empty.");
+                        ui.showLine();
                     } else {
                         try {
                             LocalDate by = LocalDate.parse(byString);
                             tasks.add(new Deadline(description, by));
-                            saveTasksSafely(tasks);
-                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
+                            saveTasksSafely(tasks, ui);
+                            ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         } catch (DateTimeParseException exception) {
-                            System.out.println("Oops! Please enter the deadline date "
+                            ui.showMessage("Oops! Please enter the deadline date "
                                     + "in YYYY-MM-DD format.");
-                            System.out.println(line);
+                            ui.showLine();
                         }
                     }
                 }
@@ -159,26 +148,26 @@ public class Pixel {
                     details = command.substring(5).trim();
                 }
                 if (details.isEmpty()) {
-                    System.out.println("Oops! Please give me an event description and time.");
-                    System.out.println(line);
+                    ui.showMessage("Oops! Please give me an event description and time.");
+                    ui.showLine();
                 } else if (!details.matches("(?s).*(?:^|\\s)/from(?:\\s+.*|$)")) {
-                    System.out.println("Oops! Please specify the event using /from and /to.");
-                    System.out.println(line);
+                    ui.showMessage("Oops! Please specify the event using /from and /to.");
+                    ui.showLine();
                 } else {
                     String[] fromParts = details.split("(?:^|\\s+)/from(?=\\s|$)", 2);
                     String[] toParts = fromParts[1].split("(?:^|\\s+)/to(?=\\s|$)", 2);
                     if (toParts.length < 2) {
-                        System.out.println("Oops! Please specify the event using /from and /to.");
-                        System.out.println(line);
+                        ui.showMessage("Oops! Please specify the event using /from and /to.");
+                        ui.showLine();
                     } else if (fromParts[0].isBlank() || toParts[0].isBlank()
                             || toParts[1].isBlank()) {
-                        System.out.println("Oops! The event description and times cannot be empty.");
-                        System.out.println(line);
+                        ui.showMessage("Oops! The event description and times cannot be empty.");
+                        ui.showLine();
                     } else {
                         tasks.add(new Event(fromParts[0].trim(), toParts[0].trim(),
                                 toParts[1].trim()));
-                        saveTasksSafely(tasks);
-                        printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
+                        saveTasksSafely(tasks, ui);
+                        ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 }
             } else if (commandType == CommandType.DELETE) {
@@ -186,21 +175,21 @@ public class Pixel {
                     int taskNumber = Integer.parseInt(command.substring(6).trim());
                     int index = taskNumber - 1;
                     if (index < 0 || index >= tasks.size()) {
-                        System.out.println("That task number does not exist.");
+                        ui.showMessage("That task number does not exist.");
                     } else {
                         Task deletedTask = tasks.remove(index);
-                        saveTasksSafely(tasks);
-                        System.out.println("Noted. I've removed this task:");
-                        System.out.println("  " + deletedTask);
-                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                        saveTasksSafely(tasks, ui);
+                        ui.showMessage("Noted. I've removed this task:");
+                        ui.showMessage("  " + deletedTask);
+                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
                     }
                 } catch (NumberFormatException exception) {
-                    System.out.println("Please specify a valid task number after delete.");
+                    ui.showMessage("Please specify a valid task number after delete.");
                 }
-                System.out.println(line);
+                ui.showLine();
             } else {
-                System.out.println("Sorry, I don't recognise that command.");
-                System.out.println(line);
+                ui.showMessage("Sorry, I don't recognise that command.");
+                ui.showLine();
             }
         }
     }
@@ -227,11 +216,11 @@ public class Pixel {
         }
     }
 
-    private static void saveTasksSafely(ArrayList<Task> tasks) {
+    private static void saveTasksSafely(ArrayList<Task> tasks, Ui ui) {
         try {
             saveTasks(tasks);
         } catch (IOException | SecurityException exception) {
-            System.out.println("Oops! I couldn't save your tasks. "
+            ui.showMessage("Oops! I couldn't save your tasks. "
                     + "Your changes will only last until Pixel exits.");
         }
     }
@@ -269,10 +258,4 @@ public class Pixel {
         return tasks;
     }
 
-    public static void printTaskAdded(Task task, int taskCount, String line) {
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        System.out.println(line);
-    }
 }
