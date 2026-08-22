@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -50,6 +52,29 @@ public class Pixel {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println((i + 1) + "." + tasks.get(i));
+                }
+                System.out.println(line);
+            } else if (commandType == CommandType.DATE) {
+                try {
+                    LocalDate date = LocalDate.parse(command.substring(4).trim());
+                    boolean hasMatchingTask = false;
+                    for (int i = 0; i < tasks.size(); i++) {
+                        if (tasks.get(i).occursOn(date)) {
+                            if (!hasMatchingTask) {
+                                System.out.println("Here are the tasks occurring on "
+                                        + Deadline.formatDate(date) + ":");
+                            }
+                            System.out.println((i + 1) + "." + tasks.get(i));
+                            hasMatchingTask = true;
+                        }
+                    }
+                    if (!hasMatchingTask) {
+                        System.out.println("There are no tasks occurring on "
+                                + Deadline.formatDate(date) + ".");
+                    }
+                } catch (DateTimeParseException exception) {
+                    System.out.println("Oops! Please enter a valid date after date "
+                            + "in YYYY-MM-DD format.");
                 }
                 System.out.println(line);
             } else if (commandType == CommandType.MARK) {
@@ -111,14 +136,21 @@ public class Pixel {
                 } else {
                     String[] parts = details.split("(?:^|\\s+)/by(?=\\s|$)", 2);
                     String description = parts[0].trim();
-                    String by = parts[1].trim();
-                    if (description.isEmpty() || by.isEmpty()) {
+                    String byString = parts[1].trim();
+                    if (description.isEmpty() || byString.isEmpty()) {
                         System.out.println("Oops! The deadline description and date cannot be empty.");
                         System.out.println(line);
                     } else {
-                        tasks.add(new Deadline(description, by));
-                        saveTasksSafely(tasks);
-                        printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
+                        try {
+                            LocalDate by = LocalDate.parse(byString);
+                            tasks.add(new Deadline(description, by));
+                            saveTasksSafely(tasks);
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size(), line);
+                        } catch (DateTimeParseException exception) {
+                            System.out.println("Oops! Please enter the deadline date "
+                                    + "in YYYY-MM-DD format.");
+                            System.out.println(line);
+                        }
                     }
                 }
             } else if (commandType == CommandType.EVENT) {

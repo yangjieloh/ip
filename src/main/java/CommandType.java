@@ -4,6 +4,7 @@
 public enum CommandType {
     BYE,
     LIST,
+    DATE,
     MARK,
     UNMARK,
     TODO,
@@ -23,6 +24,8 @@ public enum CommandType {
             return BYE;
         } else if (command.equals("list")) {
             return LIST;
+        } else if (hasKeyword(command, "date")) {
+            return DATE;
         } else if (hasKeyword(command, "mark")) {
             return MARK;
         } else if (hasKeyword(command, "unmark")) {
