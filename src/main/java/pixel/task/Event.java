@@ -2,10 +2,20 @@ package pixel.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+/** Represents a task that occurs between a start and an end time. */
 public class Event extends Task {
+    /** Start time of this event. */
     protected String from;
+    /** End time of this event. */
     protected String to;
 
+    /** Creates an event with the specified description and time range.
+     *
+     * @param description User-visible task description.
+     * @param from Event start time.
+     * @param to Event end time.
+     */
     public Event(String description, String from, String to) {
         super(description);
         this.from = from;

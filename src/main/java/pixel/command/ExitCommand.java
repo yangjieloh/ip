@@ -9,6 +9,10 @@ import pixel.ui.Ui;
  */
 public class ExitCommand extends Command {
 
+    /** Creates a command that ends the Pixel session. */
+    public ExitCommand() {
+    }
+
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Bye. Hope to see you again soon!");

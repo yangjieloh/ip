@@ -2,18 +2,29 @@ package pixel.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
 /**
  * Represents a task and whether it has been completed.
  */
 public class Task {
+    /** User-visible task description. */
     protected String description;
+    /** Whether this task has been completed. */
     protected boolean isDone;
 
+    /** Creates an incomplete task with the specified description.
+     *
+     * @param description User-visible task description.
+     */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
     }
 
+    /** Returns the completion icon for this task.
+     *
+     * @return {@code X} when done, otherwise a blank icon.
+     */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
@@ -65,27 +76,27 @@ public class Task {
 
         Task task;
         switch (fields[0]) {
-        case "T":
-            requireFieldCount(fields, 3);
-            requireNonEmpty(fields[2], "task description");
-            task = new Todo(unescapeDataField(fields[2]));
-            break;
-        case "D":
-            requireFieldCount(fields, 4);
-            requireNonEmpty(fields[2], "task description");
-            requireNonEmpty(fields[3], "deadline");
-            task = new Deadline(unescapeDataField(fields[2]), parseDeadline(fields[3]));
-            break;
-        case "E":
-            requireFieldCount(fields, 5);
-            requireNonEmpty(fields[2], "task description");
-            requireNonEmpty(fields[3], "event start time");
-            requireNonEmpty(fields[4], "event end time");
-            task = new Event(unescapeDataField(fields[2]), unescapeDataField(fields[3]),
-                    unescapeDataField(fields[4]));
-            break;
-        default:
-            throw new IllegalArgumentException("unknown task type '" + fields[0] + "'.");
+            case "T":
+                requireFieldCount(fields, 3);
+                requireNonEmpty(fields[2], "task description");
+                task = new Todo(unescapeDataField(fields[2]));
+                break;
+            case "D":
+                requireFieldCount(fields, 4);
+                requireNonEmpty(fields[2], "task description");
+                requireNonEmpty(fields[3], "deadline");
+                task = new Deadline(unescapeDataField(fields[2]), parseDeadline(fields[3]));
+                break;
+            case "E":
+                requireFieldCount(fields, 5);
+                requireNonEmpty(fields[2], "task description");
+                requireNonEmpty(fields[3], "event start time");
+                requireNonEmpty(fields[4], "event end time");
+                task = new Event(unescapeDataField(fields[2]), unescapeDataField(fields[3]),
+                        unescapeDataField(fields[4]));
+                break;
+            default:
+                throw new IllegalArgumentException("unknown task type '" + fields[0] + "'.");
         }
 
         if (fields[1].equals("1")) {
@@ -125,7 +136,11 @@ public class Task {
         }
     }
 
-    /** Escapes characters that have structural meaning in the save-file format. */
+    /** Escapes characters that have structural meaning in the save-file format.
+     *
+     * @param field Field to escape.
+     * @return Escaped field.
+     */
     protected static String escapeDataField(String field) {
         return field.replace("\\", "\\\\").replace("|", "\\|");
     }

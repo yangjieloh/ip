@@ -2,6 +2,7 @@ package pixel.task;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Owns the application's in-memory collection of tasks and its list operations.
  */
@@ -22,7 +23,10 @@ public class TaskList {
         this.tasks = new ArrayList<>(tasks);
     }
 
-    /** @return Number of tasks currently stored. */
+    /** Returns the number of tasks currently stored.
+     *
+     * @return Number of tasks currently stored.
+     */
     public int size() {
         return tasks.size();
     }
@@ -47,7 +51,10 @@ public class TaskList {
         return tasks.get(index);
     }
 
-    /** Adds a task to the end of the list. */
+    /** Adds a task to the end of the list.
+     *
+     * @param task Task to add.
+     */
     public void add(Task task) {
         tasks.add(task);
     }
@@ -62,12 +69,18 @@ public class TaskList {
         return tasks.remove(index);
     }
 
-    /** Marks the task at a zero-based index as done. */
+    /** Marks the task at a zero-based index as done.
+     *
+     * @param index Zero-based task index.
+     */
     public void markAsDone(int index) {
         tasks.get(index).markAsDone();
     }
 
-    /** Marks the task at a zero-based index as not done. */
+    /** Marks the task at a zero-based index as not done.
+     *
+     * @param index Zero-based task index.
+     */
     public void markAsNotDone(int index) {
         tasks.get(index).markAsNotDone();
     }

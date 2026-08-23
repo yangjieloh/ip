@@ -2,6 +2,7 @@ package pixel.parser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
 import pixel.command.AddCommand;
 import pixel.command.Command;
 import pixel.command.CommandType;
@@ -22,6 +23,10 @@ import pixel.task.Todo;
  */
 public class Parser {
 
+    /** Creates a parser for Pixel commands. */
+    public Parser() {
+    }
+
     /**
      * Parses a full user command into an executable command object.
      *
@@ -32,14 +37,14 @@ public class Parser {
     public Command parse(String command) {
         CommandType commandType = parseCommandType(command);
         return switch (commandType) {
-        case BYE -> new ExitCommand();
-        case LIST -> new ListCommand();
-        case DATE -> new DateCommand(parseDate(command));
-        case MARK -> new MarkCommand(parseTaskIndex(command, commandType));
-        case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
-        case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
-        case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
-        case UNKNOWN -> new UnknownCommand();
+            case BYE -> new ExitCommand();
+            case LIST -> new ListCommand();
+            case DATE -> new DateCommand(parseDate(command));
+            case MARK -> new MarkCommand(parseTaskIndex(command, commandType));
+            case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
+            case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
+            case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
+            case UNKNOWN -> new UnknownCommand();
         };
     }
 
@@ -116,11 +121,11 @@ public class Parser {
      */
     private Task parseTask(String command, CommandType commandType) {
         return switch (commandType) {
-        case TODO -> parseTodo(command);
-        case DEADLINE -> parseDeadline(command);
-        case EVENT -> parseEvent(command);
-        default -> throw new IllegalArgumentException(
-                "The command does not create a task: " + commandType);
+            case TODO -> parseTodo(command);
+            case DEADLINE -> parseDeadline(command);
+            case EVENT -> parseEvent(command);
+            default -> throw new IllegalArgumentException(
+                    "The command does not create a task: " + commandType);
         };
     }
 

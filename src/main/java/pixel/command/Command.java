@@ -1,6 +1,7 @@
 package pixel.command;
 
 import java.io.IOException;
+
 import pixel.storage.Storage;
 import pixel.task.TaskList;
 import pixel.ui.Ui;
@@ -9,6 +10,10 @@ import pixel.ui.Ui;
  * Represents an executable instruction understood by Pixel.
  */
 public abstract class Command {
+
+    /** Creates an executable command. */
+    protected Command() {
+    }
 
     /**
      * Performs this command's action using the application's collaborators.

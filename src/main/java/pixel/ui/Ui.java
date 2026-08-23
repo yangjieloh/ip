@@ -1,6 +1,7 @@
 package pixel.ui;
 
 import java.util.Scanner;
+
 import pixel.task.Task;
 
 /**
@@ -31,17 +32,26 @@ public class Ui {
         showLine();
     }
 
-    /** @return Whether another command is available from standard input. */
+    /** Checks whether another command is available from standard input.
+     *
+     * @return Whether another command is available.
+     */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();
     }
 
-    /** @return The next command entered by the user. */
+    /** Reads the next command entered by the user.
+     *
+     * @return The next trimmed command.
+     */
     public String readCommand() {
         return scanner.nextLine().trim();
     }
 
-    /** Displays one message, followed by a line break. */
+    /** Displays one message, followed by a line break.
+     *
+     * @param message Message to display.
+     */
     public void showMessage(String message) {
         System.out.println(message);
     }
@@ -51,7 +61,11 @@ public class Ui {
         showMessage(LINE);
     }
 
-    /** Displays the standard confirmation after a task is added. */
+    /** Displays the standard confirmation after a task is added.
+     *
+     * @param task Added task.
+     * @param taskCount Number of tasks after the addition.
+     */
     public void showTaskAdded(Task task, int taskCount) {
         showMessage("Got it. I've added this task:");
         showMessage("  " + task);
