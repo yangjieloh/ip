@@ -1,0 +1,75 @@
+package pixel.task;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+/** Tests the task-list operations that change or validate application state. */
+class TaskListTest {
+
+    @Test
+    void add_tasks_preservesInsertionOrderAndSize() {
+        TaskList tasks = new TaskList();
+        Task first = new Todo("first");
+        Task second = new Todo("second");
+
+        tasks.add(first);
+        tasks.add(second);
+
+        assertEquals(2, tasks.size());
+        assertEquals(first, tasks.get(0));
+        assertEquals(second, tasks.get(1));
+    }
+
+    @Test
+    void isValidIndex_emptyAndBoundaryIndexes_returnsExpectedResults() {
+        TaskList emptyTasks = new TaskList();
+        assertFalse(emptyTasks.isValidIndex(0));
+        assertFalse(emptyTasks.isValidIndex(-1));
+
+        emptyTasks.add(new Todo("only task"));
+        assertTrue(emptyTasks.isValidIndex(0));
+        assertFalse(emptyTasks.isValidIndex(1));
+        assertFalse(emptyTasks.isValidIndex(-1));
+    }
+
+    @Test
+    void delete_middleTask_returnsRemovedTaskAndShiftsFollowingTasks() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("first"));
+        Task removed = new Todo("second");
+        tasks.add(removed);
+        Task following = new Todo("third");
+        tasks.add(following);
+
+        assertEquals(removed, tasks.delete(1));
+        assertEquals(2, tasks.size());
+        assertEquals(following, tasks.get(1));
+    }
+
+    @Test
+    void markAndUnmark_task_updatesCompletionState() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        tasks.markAsDone(0);
+        assertEquals("[T][X] read book", tasks.get(0).toString());
+
+        tasks.markAsNotDone(0);
+        assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    @Test
+    void getAndDelete_invalidIndex_throwIndexOutOfBoundsException() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> tasks.get(1));
+        assertThrows(IndexOutOfBoundsException.class, () -> tasks.delete(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsDone(1));
+        assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsNotDone(-1));
+    }
+}

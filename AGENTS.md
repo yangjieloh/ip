@@ -37,6 +37,14 @@ After every update to application or test code:
 
 If `$test-ui` reports a failure, follow its fail-fast instructions and report the failure rather than claiming that the code update is complete.
 
+## JUnit coverage
+
+Maintain a target of approximately 50% method coverage, prioritizing complex, core,
+or business-critical methods. After every application code change, review the
+affected methods and add or update the corresponding JUnit tests so that this
+coverage target remains satisfied. Run the JUnit suite with the Gradle wrapper
+(`./gradlew test` or `gradlew.bat test`) before handing the change back to the user.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
