@@ -9,6 +9,10 @@ import pixel.ui.Ui;
  */
 public class UnknownCommand extends Command {
 
+    /** Creates a command for unrecognized input. */
+    public UnknownCommand() {
+    }
+
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Sorry, I don't recognise that command.");

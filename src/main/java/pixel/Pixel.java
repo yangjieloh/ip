@@ -58,7 +58,11 @@ public class Pixel {
         }
     }
 
-    /** Starts Pixel using the default relative, OS-independent data path. */
+    /**
+     * Starts Pixel using the default relative, OS-independent data path.
+     *
+     * @param args Command-line arguments, which Pixel does not currently use.
+     */
     public static void main(String[] args) {
         new Pixel(Path.of("data", "pixel.txt")).run();
     }

@@ -7,12 +7,15 @@ import java.util.Locale;
 /**
  * Represents a task that must be completed by a specific date.
  */
+
 public class Deadline extends Task {
     /** Format used when showing deadlines to users. */
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
+    /** Date by which this task must be completed. */
     protected LocalDate by;
+
 
     /**
      * Creates a deadline with the specified description and due date.
