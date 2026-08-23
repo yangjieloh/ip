@@ -1,3 +1,10 @@
+package pixel.command;
+
+import pixel.storage.Storage;
+import pixel.task.Task;
+import pixel.task.TaskList;
+import pixel.ui.Ui;
+
 /**
  * Adds a parsed task to the task list.
  */

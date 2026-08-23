@@ -1,3 +1,5 @@
+package pixel.storage;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -7,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import pixel.task.Task;
+import pixel.task.TaskList;
 
 /**
  * Loads tasks from and saves tasks to the application's data file.

@@ -1,6 +1,7 @@
+package pixel.task;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-
 /**
  * Represents a task and whether it has been completed.
  */

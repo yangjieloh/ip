@@ -1,4 +1,9 @@
+package pixel.command;
+
 import java.io.IOException;
+import pixel.storage.Storage;
+import pixel.task.TaskList;
+import pixel.ui.Ui;
 
 /**
  * Represents an executable instruction understood by Pixel.

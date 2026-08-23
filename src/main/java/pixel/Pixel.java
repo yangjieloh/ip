@@ -1,5 +1,13 @@
+package pixel;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import pixel.command.Command;
+import pixel.parser.Parser;
+import pixel.storage.Storage;
+import pixel.task.TaskList;
+import pixel.ui.Ui;
 
 /**
  * Starts the Pixel chatbot application.

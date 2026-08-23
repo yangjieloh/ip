@@ -1,3 +1,9 @@
+package pixel.command;
+
+import pixel.storage.Storage;
+import pixel.task.TaskList;
+import pixel.ui.Ui;
+
 /**
  * Ends the current Pixel session.
  */

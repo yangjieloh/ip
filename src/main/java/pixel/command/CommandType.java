@@ -1,3 +1,5 @@
+package pixel.command;
+
 /**
  * Represents the commands understood by Pixel.
  */
