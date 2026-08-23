@@ -55,6 +55,10 @@ and Javadoc requirements.
 
 ## Git
 
+All branch names and commit messages must follow the project-specific
+`seedu-git-standard` skill, based on the SE-EDU Git conventions. Before every
+commit, apply that skill, inspect the staged diff, and verify the subject and
+body meet its length, imperative-mood, formatting, and what/why requirements.
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
