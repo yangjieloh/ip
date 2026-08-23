@@ -23,5 +23,7 @@ public enum CommandType {
     /** Deletes a task. */
     DELETE,
     /** Represents unrecognized input. */
-    UNKNOWN
+    UNKNOWN,
+    /** Finds a task **/
+    FIND
 }
