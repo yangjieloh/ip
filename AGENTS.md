@@ -45,6 +45,14 @@ affected methods and add or update the corresponding JUnit tests so that this
 coverage target remains satisfied. Run the JUnit suite with the Gradle wrapper
 (`./gradlew test` or `gradlew.bat test`) before handing the change back to the user.
 
+## Java coding standard
+
+All Java production and test code must follow the project-specific
+`seedu-java-coding-standard` skill, based on the SE-EDU basic and intermediate
+Java coding standard. Apply the skill when writing, reviewing, or refactoring
+Java, including package naming, imports, naming, layout, braces, encapsulation,
+and Javadoc requirements.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
