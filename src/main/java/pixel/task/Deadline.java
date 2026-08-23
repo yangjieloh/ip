@@ -3,6 +3,10 @@ package pixel.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+/**
+ * Represents a task that must be completed by a specific date.
+ */
 public class Deadline extends Task {
     /** Format used when showing deadlines to users. */
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
@@ -10,6 +14,12 @@ public class Deadline extends Task {
 
     protected LocalDate by;
 
+    /**
+     * Creates a deadline with the specified description and due date.
+     *
+     * @param description Description of the deadline.
+     * @param by Date by which the task should be completed.
+     */
     public Deadline(String description, LocalDate by) {
         super(description);
         this.by = by;
