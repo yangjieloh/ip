@@ -1,4 +1,7 @@
+package pixel.ui;
+
 import java.util.Scanner;
+import pixel.task.Task;
 
 /**
  * Handles console input and output for Pixel.

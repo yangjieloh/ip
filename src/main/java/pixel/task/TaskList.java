@@ -1,6 +1,7 @@
+package pixel.task;
+
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * Owns the application's in-memory collection of tasks and its list operations.
  */

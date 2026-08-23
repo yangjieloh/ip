@@ -1,3 +1,10 @@
+package pixel.command;
+
+import pixel.storage.Storage;
+import pixel.task.Task;
+import pixel.task.TaskList;
+import pixel.ui.Ui;
+
 /**
  * Deletes a task from the task list.
  */
