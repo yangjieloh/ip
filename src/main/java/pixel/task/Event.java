@@ -12,7 +12,8 @@ public class Event extends Task {
     /** End time of this event. */
     protected String to;
 
-    /** Creates an event with the specified description and time range.
+    /**
+     * Creates an event with the specified description and time range.
      *
      * @param description User-visible task description.
      * @param from Event start time.

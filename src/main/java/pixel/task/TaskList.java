@@ -23,7 +23,8 @@ public class TaskList {
         this.tasks = new ArrayList<>(tasks);
     }
 
-    /** Returns the number of tasks currently stored.
+    /**
+     * Returns the number of tasks currently stored.
      *
      * @return Number of tasks currently stored.
      */
@@ -51,7 +52,8 @@ public class TaskList {
         return tasks.get(index);
     }
 
-    /** Adds a task to the end of the list.
+    /**
+     * Adds a task to the end of the list.
      *
      * @param task Task to add.
      */
@@ -69,7 +71,8 @@ public class TaskList {
         return tasks.remove(index);
     }
 
-    /** Marks the task at a zero-based index as done.
+    /**
+     * Marks the task at a zero-based index as done.
      *
      * @param index Zero-based task index.
      */
@@ -77,7 +80,8 @@ public class TaskList {
         tasks.get(index).markAsDone();
     }
 
-    /** Marks the task at a zero-based index as not done.
+    /**
+     * Marks the task at a zero-based index as not done.
      *
      * @param index Zero-based task index.
      */

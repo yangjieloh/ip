@@ -32,7 +32,8 @@ public class Ui {
         showLine();
     }
 
-    /** Checks whether another command is available from standard input.
+    /**
+     * Checks whether another command is available from standard input.
      *
      * @return Whether another command is available.
      */
@@ -40,7 +41,8 @@ public class Ui {
         return scanner.hasNextLine();
     }
 
-    /** Reads the next command entered by the user.
+    /**
+     * Reads the next command entered by the user.
      *
      * @return The next trimmed command.
      */
@@ -48,7 +50,8 @@ public class Ui {
         return scanner.nextLine().trim();
     }
 
-    /** Displays one message, followed by a line break.
+    /**
+     * Displays one message, followed by a line break.
      *
      * @param message Message to display.
      */
@@ -56,12 +59,15 @@ public class Ui {
         System.out.println(message);
     }
 
-    /** Displays the separator used between command responses. */
+    /**
+     * Displays the separator used between command responses.
+     */
     public void showLine() {
         showMessage(LINE);
     }
 
-    /** Displays the standard confirmation after a task is added.
+    /**
+     * Displays the standard confirmation after a task is added.
      *
      * @param task Added task.
      * @param taskCount Number of tasks after the addition.

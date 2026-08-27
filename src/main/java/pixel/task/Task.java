@@ -13,7 +13,8 @@ public class Task {
     protected boolean isDone;
 
 
-    /** Creates an incomplete task with the specified description.
+    /**
+     * Creates an incomplete task with the specified description.
      *
      * @param description User-visible task description.
      */
@@ -22,7 +23,8 @@ public class Task {
         this.isDone = false;
     }
 
-    /** Returns the completion icon for this task.
+    /**
+     * Returns the completion icon for this task.
      *
      * @return {@code X} when done, otherwise a blank icon.
      */
@@ -147,7 +149,8 @@ public class Task {
         }
     }
 
-    /** Escapes characters that have structural meaning in the save-file format.
+    /**
+     * Escapes characters that have structural meaning in the save-file format.
      *
      * @param field Field to escape.
      * @return Escaped field.

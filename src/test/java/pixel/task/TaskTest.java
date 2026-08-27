@@ -141,23 +141,18 @@ class TaskTest {
 
     @Test
     void fromDataString_invalidStatus_throwsException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Task.fromDataString("T | 2 | read book"));
+        assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("T | 2 | read book"));
     }
 
     @Test
     void fromDataString_unknownType_throwsException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Task.fromDataString("X | 0 | unknown task"));
+        assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("X | 0 | unknown task"));
     }
 
     @Test
     void fromDataString_malformedRecords_throwsException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Task.fromDataString("T | 0"));
-        assertThrows(IllegalArgumentException.class,
-                () -> Task.fromDataString("T | 0 |   "));
-        assertThrows(IllegalArgumentException.class,
-                () -> Task.fromDataString("D | 0 | report | not-a-date"));
+        assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("T | 0"));
+        assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("T | 0 |   "));
+        assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("D | 0 | report | not-a-date"));
     }
 }
