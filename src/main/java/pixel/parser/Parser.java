@@ -9,11 +9,11 @@ import pixel.command.CommandType;
 import pixel.command.DateCommand;
 import pixel.command.DeleteCommand;
 import pixel.command.ExitCommand;
+import pixel.command.FindCommand;
 import pixel.command.ListCommand;
 import pixel.command.MarkCommand;
-import pixel.command.UnmarkCommand;
 import pixel.command.UnknownCommand;
-import pixel.command.FindCommand;
+import pixel.command.UnmarkCommand;
 import pixel.task.Deadline;
 import pixel.task.Event;
 import pixel.task.Task;
@@ -38,15 +38,15 @@ public class Parser {
     public Command parse(String command) {
         CommandType commandType = parseCommandType(command);
         return switch (commandType) {
-        case BYE -> new ExitCommand();
-        case LIST -> new ListCommand();
-        case DATE -> new DateCommand(parseDate(command));
-        case FIND -> new FindCommand(parseFindKeyword(command));
-        case MARK -> new MarkCommand(parseTaskIndex(command, commandType));
-        case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
-        case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
-        case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
-        case UNKNOWN -> new UnknownCommand();
+            case BYE -> new ExitCommand();
+            case LIST -> new ListCommand();
+            case DATE -> new DateCommand(parseDate(command));
+            case FIND -> new FindCommand(parseFindKeyword(command));
+            case MARK -> new MarkCommand(parseTaskIndex(command, commandType));
+            case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
+            case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
+            case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
+            case UNKNOWN -> new UnknownCommand();
         };
     }
 
@@ -65,7 +65,7 @@ public class Parser {
             return CommandType.DATE;
         } else if (hasKeyword(command, "find")) {
             return CommandType.FIND;
-        }else if (hasKeyword(command, "mark")) {
+        } else if (hasKeyword(command, "mark")) {
             return CommandType.MARK;
         } else if (hasKeyword(command, "unmark")) {
             return CommandType.UNMARK;

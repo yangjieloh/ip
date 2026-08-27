@@ -3,6 +3,8 @@ package pixel.parser;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
+
 import pixel.command.AddCommand;
 import pixel.command.Command;
 import pixel.command.DateCommand;
@@ -12,7 +14,6 @@ import pixel.command.ListCommand;
 import pixel.command.MarkCommand;
 import pixel.command.UnknownCommand;
 import pixel.command.UnmarkCommand;
-import org.junit.jupiter.api.Test;
 
 /** Tests command classification and validation of user input. */
 class ParserTest {
@@ -43,18 +44,15 @@ class ParserTest {
     void parse_missingOrMalformedTaskArguments_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("todo"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("deadline report"));
-        assertThrows(IllegalArgumentException.class,
-                () -> parser.parse("deadline report /by not-a-date"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("deadline report /by not-a-date"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("event meeting"));
-        assertThrows(IllegalArgumentException.class,
-                () -> parser.parse("event meeting /from 2pm"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("event meeting /from 2pm"));
     }
 
     @Test
     void parse_missingOrMalformedQueryArguments_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("date"));
-        assertThrows(IllegalArgumentException.class,
-                () -> parser.parse("date 2019-02-30"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("date 2019-02-30"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark zero"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("delete"));
