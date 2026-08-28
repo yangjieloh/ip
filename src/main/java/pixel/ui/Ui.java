@@ -1,6 +1,7 @@
 package pixel.ui;
 
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 import pixel.task.Task;
 
@@ -17,10 +18,23 @@ public class Ui {
             + "|_|   |_/_/\\_\\___|_|";
 
     private final Scanner scanner;
+    private final Consumer<String> messageOutput;
 
-    /** Creates a UI connected to the process's standard input. */
+    /**
+     * Creates a UI connected to the process's standard input and output.
+     */
     public Ui() {
+        this(System.out::println);
+    }
+
+    /**
+     * Creates a UI that sends messages to the supplied output handler.
+     *
+     * @param messageOutput Handler for messages produced by Pixel.
+     */
+    public Ui(Consumer<String> messageOutput) {
         scanner = new Scanner(System.in);
+        this.messageOutput = messageOutput;
     }
 
     /** Displays Pixel's startup banner and greeting. */
@@ -56,7 +70,7 @@ public class Ui {
      * @param message Message to display.
      */
     public void showMessage(String message) {
-        System.out.println(message);
+        messageOutput.accept(message);
     }
 
     /**

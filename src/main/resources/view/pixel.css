@@ -1,0 +1,37 @@
+.root {
+    -fx-background-color: #f4f6f8;
+    -fx-font-family: "System";
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.dialog-text {
+    -fx-background-radius: 12;
+    -fx-padding: 10 14;
+    -fx-font-size: 14px;
+}
+
+.speaker-label {
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-padding: 10 6;
+}
+
+.user-message .dialog-text {
+    -fx-background-color: #cfe8ff;
+}
+
+.pixel-message .dialog-text {
+    -fx-background-color: #ffffff;
+}
+
+.user-message .speaker-label {
+    -fx-text-fill: #1769aa;
+}
+
+.pixel-message .speaker-label {
+    -fx-text-fill: #44546a;
+}
