@@ -12,6 +12,7 @@
     -fx-background-radius: 12;
     -fx-padding: 10 14;
     -fx-font-size: 14px;
+    -fx-text-fill: #000000;
 }
 
 .speaker-label {
@@ -29,9 +30,9 @@
 }
 
 .user-message .speaker-label {
-    -fx-text-fill: #1769aa;
+    -fx-text-fill: #000000;
 }
 
 .pixel-message .speaker-label {
-    -fx-text-fill: #44546a;
+    -fx-text-fill: #000000;
 }
