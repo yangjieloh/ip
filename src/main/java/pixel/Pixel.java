@@ -32,6 +32,30 @@ public class Pixel {
         tasks = new TaskList(storage.load(loadWarnings));
     }
 
+    /**
+     * Executes a command and returns all messages produced by Pixel.
+     *
+     * @param input Command entered by the user.
+     * @return Pixel's response, with one message per line.
+     */
+    public String getResponse(String input) {
+        StringBuilder response = new StringBuilder();
+        Ui responseUi = new Ui(message -> {
+            if (response.length() > 0) {
+                response.append(System.lineSeparator());
+            }
+            response.append(message);
+        });
+
+        try {
+            Command command = parser.parse(input.trim());
+            command.execute(tasks, responseUi, storage);
+        } catch (IllegalArgumentException exception) {
+            response.append(exception.getMessage());
+        }
+        return response.toString();
+    }
+
     /** Starts Pixel's console command loop. */
     public void run() {
         ui.showWelcome();
