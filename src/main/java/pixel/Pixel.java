@@ -87,7 +87,7 @@ public class Pixel {
      *
      * @param args Command-line arguments, which Pixel does not currently use.
      */
-    public static void main(String[] args) {
+    public static void main(String... args) {
         new Pixel(Path.of("data", "pixel.txt")).run();
     }
 }
