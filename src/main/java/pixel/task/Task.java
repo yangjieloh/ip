@@ -7,10 +7,8 @@ import java.time.format.DateTimeParseException;
  * Represents a task and whether it has been completed.
  */
 public class Task {
-    /** User-visible task description. */
-    protected String description;
-    /** Whether this task has been completed. */
-    protected boolean isDone;
+    private final String description;
+    private boolean isDone;
 
 
     /**
@@ -40,6 +38,14 @@ public class Task {
     /** Marks this task as not completed. */
     public void markAsNotDone() {
         isDone = false;
+    }
+
+    protected String getDescription() {
+        return description;
+    }
+
+    protected boolean isDone() {
+        return isDone;
     }
 
     /**

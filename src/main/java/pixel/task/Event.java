@@ -59,7 +59,7 @@ public class Event extends Task {
 
     @Override
     public String toDataString() {
-        return "E | " + (isDone ? "1" : "0") + " | " + escapeDataField(description)
+        return "E | " + (isDone() ? "1" : "0") + " | " + escapeDataField(getDescription())
                 + " | " + escapeDataField(from) + " | " + escapeDataField(to);
     }
 
