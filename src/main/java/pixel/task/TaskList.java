@@ -20,6 +20,7 @@ public class TaskList {
      * @param tasks Initial tasks.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "initial tasks must not be null";
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -58,6 +59,7 @@ public class TaskList {
      * @param task Task to add.
      */
     public void add(Task task) {
+        assert task != null : "task must not be null";
         tasks.add(task);
     }
 
