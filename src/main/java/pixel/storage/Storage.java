@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import pixel.task.Task;
 import pixel.task.TaskList;
@@ -40,10 +41,9 @@ public class Storage {
             Files.createDirectories(parentDirectory);
         }
 
-        ArrayList<String> taskData = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            taskData.add(tasks.get(i).toDataString());
-        }
+        List<String> taskData = IntStream.range(0, tasks.size())
+                .mapToObj(index -> tasks.get(index).toDataString())
+                .toList();
 
         Path temporaryFile = filePath.resolveSibling(filePath.getFileName() + ".tmp");
         Files.write(temporaryFile, taskData, StandardCharsets.UTF_8);
