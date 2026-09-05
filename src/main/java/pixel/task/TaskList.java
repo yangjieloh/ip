@@ -7,7 +7,7 @@ import java.util.List;
  * Owns the application's in-memory collection of tasks and its list operations.
  */
 public class TaskList {
-    private final ArrayList<Task> tasks;
+    private final List<Task> tasks;
 
     /** Creates an empty task list. */
     public TaskList() {
