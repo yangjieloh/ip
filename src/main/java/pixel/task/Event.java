@@ -26,6 +26,31 @@ public class Event extends Task {
     }
 
     @Override
+    public Task withDescription(String newDescription) {
+        return preserveStatus(new Event(newDescription, from, to));
+    }
+
+    /**
+     * Returns a copy of this event with a new start time.
+     *
+     * @param newStart Replacement start time.
+     * @return Updated event with the same remaining details and completion status.
+     */
+    public Event withStart(String newStart) {
+        return preserveStatus(new Event(getDescription(), newStart, to));
+    }
+
+    /**
+     * Returns a copy of this event with a new end time.
+     *
+     * @param newEnd Replacement end time.
+     * @return Updated event with the same remaining details and completion status.
+     */
+    public Event withEnd(String newEnd) {
+        return preserveStatus(new Event(getDescription(), from, newEnd));
+    }
+
+    @Override
     public boolean occursOn(LocalDate date) {
         try {
             LocalDate startDate = parseLeadingDate(from);

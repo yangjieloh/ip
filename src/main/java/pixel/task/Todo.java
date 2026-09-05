@@ -15,6 +15,11 @@ public class Todo extends Task {
     }
 
     @Override
+    public Task withDescription(String newDescription) {
+        return preserveStatus(new Todo(newDescription));
+    }
+
+    @Override
     public String toString() {
         return "[T]" + super.toString();
     }

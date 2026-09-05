@@ -22,8 +22,10 @@ public enum CommandType {
     EVENT,
     /** Deletes a task. */
     DELETE,
+    /** Updates one detail of an existing task. */
+    UPDATE,
     /** Represents unrecognized input. */
     UNKNOWN,
-    /** Finds a task **/
+    /** Finds a task. */
     FIND
 }

@@ -1117,3 +1117,110 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## UI-18: Update task details without changing other state
+
+**Aim:** Verify that `update` changes only the selected detail, preserves task type,
+completion status, position, and unspecified details, saves valid updates, and rejects
+invalid updates without changing the list.
+
+**Input commands:**
+
+```text
+todo read book
+mark 1
+update 1 /description read novel
+update 1 /to 5pm
+deadline submit report /by 2026-09-05
+update 2 /by 2026-09-10
+update 2 /by tomorrow
+event meeting /from 2pm /to 4pm
+update 3 /to 5pm
+update 3 /from 3pm
+update 9 /description missing
+update abc /description invalid
+update 1 description invalid
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [T][X] read novel
+____________________________________________________________
+____________________________________________________________
+Only events have a /to time.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] submit report (by: Sep 05 2026)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [D][ ] submit report (by: Sep 10 2026)
+____________________________________________________________
+____________________________________________________________
+Oops! Please enter the deadline date in YYYY-MM-DD format.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] meeting (from: 2pm to: 4pm)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [E][ ] meeting (from: 2pm to: 5pm)
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [E][ ] meeting (from: 3pm to: 5pm)
+____________________________________________________________
+____________________________________________________________
+That task number does not exist.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after update.
+____________________________________________________________
+____________________________________________________________
+Use /description, /by, /from, or /to followed by a new value.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read novel
+2.[D][ ] submit report (by: Sep 10 2026)
+3.[E][ ] meeting (from: 3pm to: 5pm)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file (`data/pixel.txt`):**
+
+```text
+T | 1 | read novel
+D | 0 | submit report | 2026-09-10
+E | 0 | meeting | 3pm | 5pm
+```

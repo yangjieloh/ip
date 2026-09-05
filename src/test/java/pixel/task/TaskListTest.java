@@ -63,6 +63,24 @@ class TaskListTest {
     }
 
     @Test
+    void replace_middleTask_preservesListOrderAndSize() {
+        TaskList tasks = new TaskList();
+        Task first = new Todo("first");
+        Task replacement = new Todo("updated second");
+        Task third = new Todo("third");
+        tasks.add(first);
+        tasks.add(new Todo("second"));
+        tasks.add(third);
+
+        tasks.replace(1, replacement);
+
+        assertEquals(3, tasks.size());
+        assertEquals(first, tasks.get(0));
+        assertEquals(replacement, tasks.get(1));
+        assertEquals(third, tasks.get(2));
+    }
+
+    @Test
     void getAndDelete_invalidIndex_throwIndexOutOfBoundsException() {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("read book"));
@@ -71,5 +89,7 @@ class TaskListTest {
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.delete(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsDone(1));
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsNotDone(-1));
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> tasks.replace(1, new Todo("replacement")));
     }
 }

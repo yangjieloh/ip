@@ -14,6 +14,8 @@ import pixel.command.ListCommand;
 import pixel.command.MarkCommand;
 import pixel.command.UnknownCommand;
 import pixel.command.UnmarkCommand;
+import pixel.command.UpdateCommand;
+import pixel.command.UpdateField;
 import pixel.task.Deadline;
 import pixel.task.Event;
 import pixel.task.Task;
@@ -46,6 +48,7 @@ public class Parser {
             case UNMARK -> new UnmarkCommand(parseTaskIndex(command, commandType));
             case TODO, DEADLINE, EVENT -> new AddCommand(parseTask(command, commandType));
             case DELETE -> new DeleteCommand(parseTaskIndex(command, commandType));
+            case UPDATE -> parseUpdate(command);
             case UNKNOWN -> new UnknownCommand();
         };
     }
@@ -77,6 +80,8 @@ public class Parser {
             return CommandType.EVENT;
         } else if (hasKeyword(command, "delete")) {
             return CommandType.DELETE;
+        } else if (hasKeyword(command, "update")) {
+            return CommandType.UPDATE;
         }
         return CommandType.UNKNOWN;
     }
@@ -147,6 +152,41 @@ public class Parser {
             default -> throw new IllegalArgumentException(
                     "The command does not create a task: " + commandType);
         };
+    }
+
+    private UpdateCommand parseUpdate(String command) {
+        String arguments = getArguments(command, "update");
+        String[] indexAndDetails = arguments.split("\\s+", 2);
+        if (indexAndDetails.length < 2) {
+            throw new IllegalArgumentException(
+                    "Please specify a task number and detail to update.");
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(indexAndDetails[0]) - 1;
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException(
+                    "Please specify a valid task number after update.", exception);
+        }
+
+        String[] fieldAndValue = indexAndDetails[1].split("\\s+", 2);
+        if (fieldAndValue.length < 2 || !fieldAndValue[0].startsWith("/")) {
+            throw new IllegalArgumentException(
+                    "Use /description, /by, /from, or /to followed by a new value.");
+        }
+
+        UpdateField field;
+        try {
+            field = UpdateField.valueOf(fieldAndValue[0].substring(1).toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "Use /description, /by, /from, or /to followed by a new value.", exception);
+        }
+        if (fieldAndValue[1].isBlank()) {
+            throw new IllegalArgumentException("The updated value cannot be empty.");
+        }
+        return new UpdateCommand(index, field, fieldAndValue[1].trim());
     }
 
     private Todo parseTodo(String command) {

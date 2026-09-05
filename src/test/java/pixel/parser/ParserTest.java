@@ -14,6 +14,7 @@ import pixel.command.ListCommand;
 import pixel.command.MarkCommand;
 import pixel.command.UnknownCommand;
 import pixel.command.UnmarkCommand;
+import pixel.command.UpdateCommand;
 
 /** Tests command classification and validation of user input. */
 class ParserTest {
@@ -30,6 +31,7 @@ class ParserTest {
         assertInstanceOf(AddCommand.class, parser.parse("deadline submit report /by 2019-10-15"));
         assertInstanceOf(AddCommand.class, parser.parse("event meeting /from 2pm /to 4pm"));
         assertInstanceOf(DeleteCommand.class, parser.parse("delete 1"));
+        assertInstanceOf(UpdateCommand.class, parser.parse("update 1 /description revised task"));
         assertInstanceOf(UnknownCommand.class, parser.parse("blah"));
     }
 
@@ -56,14 +58,21 @@ class ParserTest {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark zero"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("delete"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("update"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("update one /description revised"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 description revised"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 /unknown revised"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 /to"));
     }
 
     @Test
     void parse_validTaskNumbers_acceptsOneBasedIndexes() {
         Command mark = parser.parse("mark 1");
         Command delete = parser.parse("delete 100");
+        Command update = parser.parse("update 2 /to 5pm");
 
         assertInstanceOf(MarkCommand.class, mark);
         assertInstanceOf(DeleteCommand.class, delete);
+        assertInstanceOf(UpdateCommand.class, update);
     }
 }
