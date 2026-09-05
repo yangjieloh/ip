@@ -49,6 +49,30 @@ public class Task {
     }
 
     /**
+     * Returns a copy of this task with a new description.
+     *
+     * @param newDescription Replacement description.
+     * @return Updated task with the same completion status.
+     */
+    public Task withDescription(String newDescription) {
+        return preserveStatus(new Task(newDescription));
+    }
+
+    /**
+     * Copies this task's completion status to a replacement task.
+     *
+     * @param replacement Replacement task.
+     * @param <T> Concrete replacement task type.
+     * @return Replacement with the same completion status as this task.
+     */
+    protected <T extends Task> T preserveStatus(T replacement) {
+        if (isDone) {
+            replacement.markAsDone();
+        }
+        return replacement;
+    }
+
+    /**
      * Checks whether this task occurs on a given date.
      * Tasks without a structured date do not occur on any searchable date.
      *

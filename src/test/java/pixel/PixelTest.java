@@ -40,4 +40,36 @@ class PixelTest {
 
         assertEquals("Bye. Hope to see you again soon!", response);
     }
+
+    @Test
+    void getResponse_updateCommands_changeOnlySelectedDetails(@TempDir Path tempDir) {
+        Pixel pixel = new Pixel(tempDir.resolve("pixel.txt"));
+        pixel.getResponse("todo read book");
+        pixel.getResponse("deadline submit report /by 2026-09-05");
+        pixel.getResponse("event meeting /from 2pm /to 4pm");
+        pixel.getResponse("mark 3");
+
+        pixel.getResponse("update 1 /description read novel");
+        pixel.getResponse("update 2 /by 2026-09-10");
+        pixel.getResponse("update 3 /to 5pm");
+
+        assertEquals("Here are the tasks in your list:" + System.lineSeparator()
+                + "1.[T][ ] read novel" + System.lineSeparator()
+                + "2.[D][ ] submit report (by: Sep 10 2026)" + System.lineSeparator()
+                + "3.[E][X] meeting (from: 2pm to: 5pm)", pixel.getResponse("list"));
+    }
+
+    @Test
+    void getResponse_inapplicableOrInvalidUpdate_preservesTask(@TempDir Path tempDir) {
+        Pixel pixel = new Pixel(tempDir.resolve("pixel.txt"));
+        pixel.getResponse("todo read book");
+        pixel.getResponse("deadline submit report /by 2026-09-05");
+
+        assertEquals("Only events have a /to time.", pixel.getResponse("update 1 /to 5pm"));
+        assertEquals("Oops! Please enter the deadline date in YYYY-MM-DD format.",
+                pixel.getResponse("update 2 /by tomorrow"));
+        assertEquals("Here are the tasks in your list:" + System.lineSeparator()
+                + "1.[T][ ] read book" + System.lineSeparator()
+                + "2.[D][ ] submit report (by: Sep 05 2026)", pixel.getResponse("list"));
+    }
 }

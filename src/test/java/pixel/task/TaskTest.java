@@ -155,4 +155,43 @@ class TaskTest {
         assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("T | 0 |   "));
         assertThrows(IllegalArgumentException.class, () -> Task.fromDataString("D | 0 | report | not-a-date"));
     }
+
+    @Test
+    void withDescription_completedTypedTasks_preservesTypeDetailsAndStatus() {
+        Todo todo = new Todo("old todo");
+        Deadline deadline = new Deadline("old deadline", LocalDate.of(2026, 9, 5));
+        Event event = new Event("old event", "Monday", "Tuesday");
+        todo.markAsDone();
+        deadline.markAsDone();
+        event.markAsDone();
+
+        assertEquals("[T][X] new todo", todo.withDescription("new todo").toString());
+        assertEquals("[D][X] new deadline (by: Sep 05 2026)",
+                deadline.withDescription("new deadline").toString());
+        assertEquals("[E][X] new event (from: Monday to: Tuesday)",
+                event.withDescription("new event").toString());
+    }
+
+    @Test
+    void withDeadline_completedDeadline_preservesDescriptionAndStatus() {
+        Deadline deadline = new Deadline("submit report", LocalDate.of(2026, 9, 5));
+        deadline.markAsDone();
+
+        Deadline updated = deadline.withDeadline(LocalDate.of(2026, 9, 10));
+
+        assertEquals("[D][X] submit report (by: Sep 10 2026)", updated.toString());
+        assertEquals("D | 1 | submit report | 2026-09-10", updated.toDataString());
+    }
+
+    @Test
+    void withEventTimes_completedEvent_preservesOtherDetailsAndStatus() {
+        Event event = new Event("meeting", "2pm", "4pm");
+        event.markAsDone();
+
+        Event newStart = event.withStart("3pm");
+        Event newEnd = event.withEnd("5pm");
+
+        assertEquals("[E][X] meeting (from: 3pm to: 4pm)", newStart.toString());
+        assertEquals("[E][X] meeting (from: 2pm to: 5pm)", newEnd.toString());
+    }
 }

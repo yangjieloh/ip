@@ -74,6 +74,17 @@ public class TaskList {
     }
 
     /**
+     * Replaces the task at a zero-based index without changing list order.
+     *
+     * @param index Zero-based task index.
+     * @param task Replacement task.
+     */
+    public void replace(int index, Task task) {
+        assert task != null : "replacement task must not be null";
+        tasks.set(index, task);
+    }
+
+    /**
      * Marks the task at a zero-based index as done.
      *
      * @param index Zero-based task index.
