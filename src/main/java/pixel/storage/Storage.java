@@ -18,6 +18,9 @@ import pixel.task.TaskList;
  * Loads tasks from and saves tasks to the application's data file.
  */
 public class Storage {
+    private static final int MAX_REPLACE_ATTEMPTS = 3;
+    private static final long REPLACE_RETRY_DELAY_MILLISECONDS = 25;
+
     private final Path filePath;
 
     /**
@@ -47,11 +50,40 @@ public class Storage {
 
         Path temporaryFile = filePath.resolveSibling(filePath.getFileName() + ".tmp");
         Files.write(temporaryFile, taskData, StandardCharsets.UTF_8);
+        replaceDataFile(temporaryFile);
+    }
+
+    private void replaceDataFile(Path temporaryFile) throws IOException {
+        IOException lastException = null;
+        for (int attempt = 1; attempt <= MAX_REPLACE_ATTEMPTS; attempt++) {
+            try {
+                moveTemporaryFile(temporaryFile);
+                return;
+            } catch (IOException exception) {
+                lastException = exception;
+                if (attempt < MAX_REPLACE_ATTEMPTS) {
+                    waitBeforeRetry();
+                }
+            }
+        }
+        throw lastException;
+    }
+
+    private void moveTemporaryFile(Path temporaryFile) throws IOException {
         try {
             Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.ATOMIC_MOVE);
         } catch (AtomicMoveNotSupportedException exception) {
             Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private void waitBeforeRetry() throws IOException {
+        try {
+            Thread.sleep(REPLACE_RETRY_DELAY_MILLISECONDS);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted while retrying the task save.", exception);
         }
     }
 
@@ -80,7 +112,14 @@ public class Storage {
                 continue;
             }
             try {
-                tasks.add(Task.fromDataString(taskData));
+                Task task = Task.fromDataString(taskData);
+                boolean isDuplicate = tasks.stream()
+                        .anyMatch(existingTask -> existingTask.hasSameDetails(task));
+                if (isDuplicate) {
+                    warnings.add("Oops! I skipped duplicate saved task on line " + (i + 1) + ".");
+                } else {
+                    tasks.add(task);
+                }
             } catch (IllegalArgumentException exception) {
                 warnings.add("Oops! I skipped invalid saved task on line " + (i + 1)
                         + ": " + exception.getMessage());

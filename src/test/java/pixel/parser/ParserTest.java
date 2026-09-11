@@ -37,7 +37,7 @@ class ParserTest {
 
     @Test
     void parse_leadingAndTrailingWhitespace_preservesCommandBoundaryRules() {
-        assertInstanceOf(UnknownCommand.class, parser.parse(" todo read book"));
+        assertInstanceOf(AddCommand.class, parser.parse(" todo read book"));
         assertInstanceOf(AddCommand.class, parser.parse("todo read book "));
         assertInstanceOf(UnknownCommand.class, parser.parse("todoist read book"));
     }
@@ -49,6 +49,14 @@ class ParserTest {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("deadline report /by not-a-date"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("event meeting"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("event meeting /from 2pm"));
+        assertThrows(IllegalArgumentException.class, () ->
+                parser.parse("deadline report /by 2019-10-15 /by 2019-10-16"));
+        assertThrows(IllegalArgumentException.class, () ->
+                parser.parse("event meeting /from 2pm /from 3pm /to 4pm"));
+        assertThrows(IllegalArgumentException.class, () ->
+                parser.parse("event meeting /to 4pm /from 2pm"));
+        assertThrows(IllegalArgumentException.class, () ->
+                parser.parse("event meeting /from 2019-10-16 /to 2019-10-15"));
     }
 
     @Test
@@ -57,12 +65,17 @@ class ParserTest {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("date 2019-02-30"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark zero"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("mark 0"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("mark 1 extra"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("delete"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("update"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("update one /description revised"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 description revised"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 /unknown revised"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("update 1 /to"));
+        assertThrows(IllegalArgumentException.class, () ->
+                parser.parse("update 1 /description revised /to 5pm"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse(null));
     }
 
     @Test

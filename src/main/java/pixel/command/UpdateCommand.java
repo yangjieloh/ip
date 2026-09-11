@@ -39,6 +39,10 @@ public class UpdateCommand extends Command {
         }
 
         Task updatedTask = createUpdatedTask(tasks.get(index));
+        if (tasks.containsSameDetailsExcept(updatedTask, index)) {
+            throw new IllegalArgumentException(
+                    "That update would duplicate another task in your list.");
+        }
         tasks.replace(index, updatedTask);
         saveTasksSafely(tasks, ui, storage);
         ui.showMessage("Got it. I've updated this task:");

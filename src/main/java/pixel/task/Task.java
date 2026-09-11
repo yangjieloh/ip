@@ -94,6 +94,19 @@ public class Task {
     }
 
     /**
+     * Checks whether another task has the same type and user-entered details.
+     * Completion status is intentionally ignored.
+     *
+     * @param other Task to compare.
+     * @return Whether both tasks represent the same list item.
+     */
+    public boolean hasSameDetails(Task other) {
+        return other != null
+                && getClass().equals(other.getClass())
+                && description.equals(other.description);
+    }
+
+    /**
      * Returns the representation used when saving this task to disk.
      *
      * @return Serialized task data.

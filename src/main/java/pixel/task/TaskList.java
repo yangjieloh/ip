@@ -64,6 +64,32 @@ public class TaskList {
     }
 
     /**
+     * Checks whether the list already contains a task with the same details.
+     *
+     * @param task Candidate task.
+     * @return Whether an equivalent task is already present.
+     */
+    public boolean containsSameDetails(Task task) {
+        return containsSameDetailsExcept(task, -1);
+    }
+
+    /**
+     * Checks for an equivalent task while excluding one existing position.
+     *
+     * @param task Candidate task.
+     * @param excludedIndex Index not to compare, such as the task being updated.
+     * @return Whether another equivalent task is present.
+     */
+    public boolean containsSameDetailsExcept(Task task, int excludedIndex) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i != excludedIndex && tasks.get(i).hasSameDetails(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Removes and returns the task at a zero-based index.
      *
      * @param index Zero-based task index.

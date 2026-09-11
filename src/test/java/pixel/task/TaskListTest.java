@@ -81,6 +81,19 @@ class TaskListTest {
     }
 
     @Test
+    void containsSameDetails_sameAndDifferentTasks_returnsExpectedResults() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        tasks.add(new Deadline("submit report", java.time.LocalDate.of(2026, 9, 12)));
+
+        assertTrue(tasks.containsSameDetails(new Todo("read book")));
+        assertFalse(tasks.containsSameDetails(new Todo("Read book")));
+        assertFalse(tasks.containsSameDetails(
+                new Deadline("submit report", java.time.LocalDate.of(2026, 9, 13))));
+        assertFalse(tasks.containsSameDetailsExcept(new Todo("read book"), 0));
+    }
+
+    @Test
     void getAndDelete_invalidIndex_throwIndexOutOfBoundsException() {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("read book"));
@@ -89,7 +102,7 @@ class TaskListTest {
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.delete(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsDone(1));
         assertThrows(IndexOutOfBoundsException.class, () -> tasks.markAsNotDone(-1));
-        assertThrows(IndexOutOfBoundsException.class,
-                () -> tasks.replace(1, new Todo("replacement")));
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                tasks.replace(1, new Todo("replacement")));
     }
 }

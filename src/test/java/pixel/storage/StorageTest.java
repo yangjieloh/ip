@@ -72,4 +72,25 @@ class StorageTest {
         assertEquals(1, warnings.size());
         assertTrue(warnings.get(0).contains("line 2"));
     }
+
+    @Test
+    void load_duplicateAndInvalidEventRecords_skipsBadRecordsWithWarnings(@TempDir Path tempDir)
+            throws Exception {
+        Path file = tempDir.resolve("pixel.txt");
+        Files.writeString(file, "T | 0 | repeated\n"
+                + "T | 1 | repeated\n"
+                + "E | 0 | backwards | 2026-09-13 | 2026-09-12\n"
+                + "T | 0 | valid\n");
+        Storage storage = new Storage(file);
+        ArrayList<String> warnings = new ArrayList<>();
+
+        ArrayList<Task> loaded = storage.load(warnings);
+
+        assertEquals(2, loaded.size());
+        assertEquals("[T][ ] repeated", loaded.get(0).toString());
+        assertEquals("[T][ ] valid", loaded.get(1).toString());
+        assertEquals(2, warnings.size());
+        assertTrue(warnings.get(0).contains("duplicate saved task on line 2"));
+        assertTrue(warnings.get(1).contains("event start must be before"));
+    }
 }

@@ -88,4 +88,19 @@ class PixelTest {
                 + "1.[T][ ] read book" + System.lineSeparator()
                 + "2.[D][ ] submit report (by: Sep 05 2026)", pixel.getResponse("list"));
     }
+
+    @Test
+    void getResponse_duplicateAddAndUpdate_preservesUniqueTasks(@TempDir Path tempDir) {
+        Pixel pixel = new Pixel(tempDir.resolve("pixel.txt"));
+        pixel.getResponse("todo alpha");
+        pixel.getResponse("todo beta");
+
+        assertEquals("This task is already in your list.", pixel.getResponse("todo alpha"));
+        assertTrue(pixel.isLastResponseError());
+        assertEquals("That update would duplicate another task in your list.",
+                pixel.getResponse("update 2 /description alpha"));
+        assertEquals("Here are the tasks in your list:" + System.lineSeparator()
+                + "1.[T][ ] alpha" + System.lineSeparator()
+                + "2.[T][ ] beta", pixel.getResponse("list"));
+    }
 }

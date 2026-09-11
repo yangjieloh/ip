@@ -1,12 +1,25 @@
 package pixel.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 /**
  * Represents a task that occurs over a specified period.
  */
 public class Event extends Task {
+    private static final DateTimeFormatter SPACE_SEPARATED_DATE_TIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter TWELVE_HOUR_TIME = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .appendPattern("h[:mm]a")
+            .toFormatter(Locale.ENGLISH);
+    private static final LocalDate TIME_ONLY_COMPARISON_DATE = LocalDate.of(1970, 1, 1);
+
     /** Start time of this event. */
     protected String from;
     /** End time of this event. */
@@ -21,6 +34,7 @@ public class Event extends Task {
      */
     public Event(String description, String from, String to) {
         super(description);
+        validateChronologicalOrder(from, to);
         this.from = from;
         this.to = to;
     }
@@ -63,6 +77,50 @@ public class Event extends Task {
             return !date.isBefore(startDate) && !date.isAfter(endDate);
         } catch (DateTimeParseException exception) {
             return false;
+        }
+    }
+
+    @Override
+    public boolean hasSameDetails(Task other) {
+        return super.hasSameDetails(other)
+                && from.equals(((Event) other).from)
+                && to.equals(((Event) other).to);
+    }
+
+    private static void validateChronologicalOrder(String from, String to) {
+        LocalDateTime start = parseStructuredDateTime(from);
+        LocalDateTime end = parseStructuredDateTime(to);
+        if (start != null && end != null && !start.isBefore(end)) {
+            throw new IllegalArgumentException(
+                    "Oops! The event start must be before the event end.");
+        }
+    }
+
+    private static LocalDateTime parseStructuredDateTime(String value) {
+        try {
+            return LocalDateTime.parse(value);
+        } catch (DateTimeParseException exception) {
+            try {
+                return LocalDateTime.parse(value, SPACE_SEPARATED_DATE_TIME);
+            } catch (DateTimeParseException nestedException) {
+                try {
+                    return LocalDate.parse(value).atStartOfDay();
+                } catch (DateTimeParseException ignoredException) {
+                    return parseStructuredTime(value);
+                }
+            }
+        }
+    }
+
+    private static LocalDateTime parseStructuredTime(String value) {
+        try {
+            return TIME_ONLY_COMPARISON_DATE.atTime(LocalTime.parse(value));
+        } catch (DateTimeParseException exception) {
+            try {
+                return TIME_ONLY_COMPARISON_DATE.atTime(LocalTime.parse(value, TWELVE_HOUR_TIME));
+            } catch (DateTimeParseException ignoredException) {
+                return null;
+            }
         }
     }
 

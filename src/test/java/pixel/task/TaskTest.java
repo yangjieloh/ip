@@ -16,6 +16,35 @@ import org.junit.jupiter.api.Test;
 class TaskTest {
 
     @Test
+    void hasSameDetails_matchingTasks_ignoresStatusButIncludesTypedDetails() {
+        Todo first = new Todo("read book");
+        Todo completed = new Todo("read book");
+        completed.markAsDone();
+
+        assertTrue(first.hasSameDetails(completed));
+        assertFalse(first.hasSameDetails(new Todo("Read book")));
+        assertFalse(first.hasSameDetails(new Deadline("read book", LocalDate.of(2026, 9, 12))));
+        assertTrue(new Event("meeting", "2pm", "4pm")
+                .hasSameDetails(new Event("meeting", "2pm", "4pm")));
+        assertFalse(new Event("meeting", "2pm", "4pm")
+                .hasSameDetails(new Event("meeting", "3pm", "4pm")));
+    }
+
+    @Test
+    void eventConstructor_structuredInvalidRange_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Event("meeting", "2026-09-12", "2026-09-12"));
+        assertThrows(IllegalArgumentException.class, () ->
+                new Event("meeting", "2026-09-13 14:00", "2026-09-12 15:00"));
+        assertThrows(IllegalArgumentException.class, () ->
+                new Event("meeting", "2026-09-12T14:00", "2026-09-12T14:00"));
+        assertThrows(IllegalArgumentException.class, () ->
+                new Event("meeting", "4pm", "2pm"));
+        assertThrows(IllegalArgumentException.class, () ->
+                new Event("meeting", "14:00", "14:00"));
+    }
+
+    @Test
     void getStatusIcon_newTask_returnsBlankIcon() {
         Task task = new Task("read book");
 

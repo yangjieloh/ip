@@ -22,6 +22,9 @@ public class AddCommand extends Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
+        if (tasks.containsSameDetails(task)) {
+            throw new IllegalArgumentException("This task is already in your list.");
+        }
         tasks.add(task);
         saveTasksSafely(tasks, ui, storage);
         ui.showTaskAdded(task, tasks.size());

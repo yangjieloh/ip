@@ -2,6 +2,8 @@ package pixel.parser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import pixel.command.AddCommand;
 import pixel.command.Command;
@@ -38,6 +40,10 @@ public class Parser {
      * @throws IllegalArgumentException If a recognized command has invalid arguments.
      */
     public Command parse(String command) {
+        if (command == null) {
+            throw new IllegalArgumentException("Oops! The command cannot be null.");
+        }
+        command = command.trim();
         CommandType commandType = parseCommandType(command);
         return switch (commandType) {
             case BYE -> new ExitCommand();
@@ -128,8 +134,13 @@ public class Parser {
      */
     private int parseTaskIndex(String command, CommandType commandType) {
         String keyword = commandType.name().toLowerCase();
+        String taskNumber = getArguments(command, keyword);
+        if (!taskNumber.matches("[1-9]\\d*")) {
+            throw new IllegalArgumentException("Please specify a valid task number after "
+                    + keyword + ".");
+        }
         try {
-            return Integer.parseInt(getArguments(command, keyword)) - 1;
+            return Integer.parseInt(taskNumber) - 1;
         } catch (NumberFormatException exception) {
             throw new IllegalArgumentException("Please specify a valid task number after "
                     + keyword + ".", exception);
@@ -162,6 +173,11 @@ public class Parser {
                     "Please specify a task number and detail to update.");
         }
 
+        if (!indexAndDetails[0].matches("[1-9]\\d*")) {
+            throw new IllegalArgumentException(
+                    "Please specify a valid task number after update.");
+        }
+
         int index;
         try {
             index = Integer.parseInt(indexAndDetails[0]) - 1;
@@ -186,6 +202,10 @@ public class Parser {
         if (fieldAndValue[1].isBlank()) {
             throw new IllegalArgumentException("The updated value cannot be empty.");
         }
+        if (countUpdateParameters(indexAndDetails[1]) != 1) {
+            throw new IllegalArgumentException(
+                    "Please update exactly one detail at a time.");
+        }
         return new UpdateCommand(index, field, fieldAndValue[1].trim());
     }
 
@@ -206,6 +226,12 @@ public class Parser {
         } else if (!details.matches("(?s).*(?:^|\\s)/by(?:\\s+.*|$)")) {
             throw new IllegalArgumentException(
                     "Oops! Please specify the deadline using /by.");
+        } else if (countParameter(details, "/by") != 1) {
+            throw new IllegalArgumentException(
+                    "Oops! Please specify /by exactly once.");
+        } else if (containsAnyParameter(details, "/from", "/to", "/description")) {
+            throw new IllegalArgumentException(
+                    "Oops! A deadline accepts only the /by parameter.");
         }
 
         String[] parts = details.split("(?:^|\\s+)/by(?=\\s|$)", 2);
@@ -229,12 +255,24 @@ public class Parser {
         if (details.isEmpty()) {
             throw new IllegalArgumentException(
                     "Oops! Please give me an event description and time.");
-        } else if (!details.matches("(?s).*(?:^|\\s)/from(?:\\s+.*|$)")) {
+        } else if (countParameter(details, "/from") == 0
+                || countParameter(details, "/to") == 0) {
             throw new IllegalArgumentException(
                     "Oops! Please specify the event using /from and /to.");
+        } else if (countParameter(details, "/from") != 1
+                || countParameter(details, "/to") != 1) {
+            throw new IllegalArgumentException(
+                    "Oops! Please specify /from and /to exactly once.");
+        } else if (containsAnyParameter(details, "/by", "/description")) {
+            throw new IllegalArgumentException(
+                    "Oops! An event accepts only the /from and /to parameters.");
         }
 
         String[] fromParts = details.split("(?:^|\\s+)/from(?=\\s|$)", 2);
+        if (countParameter(fromParts[0], "/to") > 0) {
+            throw new IllegalArgumentException(
+                    "Oops! Please place /from before /to.");
+        }
         String[] toParts = fromParts[1].split("(?:^|\\s+)/to(?=\\s|$)", 2);
         if (toParts.length < 2) {
             throw new IllegalArgumentException(
@@ -260,5 +298,32 @@ public class Parser {
                 || command.length() > keyword.length()
                 && command.startsWith(keyword)
                 && Character.isWhitespace(command.charAt(keyword.length()));
+    }
+
+    private int countUpdateParameters(String details) {
+        return countParameter(details, "/description")
+                + countParameter(details, "/by")
+                + countParameter(details, "/from")
+                + countParameter(details, "/to");
+    }
+
+    private boolean containsAnyParameter(String details, String... parameters) {
+        for (String parameter : parameters) {
+            if (countParameter(details, parameter) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int countParameter(String details, String parameter) {
+        Pattern parameterPattern = Pattern.compile(
+                "(?:^|\\s)" + Pattern.quote(parameter) + "(?=\\s|$)");
+        Matcher matcher = parameterPattern.matcher(details);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
     }
 }

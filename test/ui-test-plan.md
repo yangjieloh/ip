@@ -377,7 +377,7 @@ Nice! I've marked this task as done:
   [T][X] alpha
 ____________________________________________________________
 ____________________________________________________________
-That task number does not exist.
+Please specify a valid task number after mark.
 ____________________________________________________________
 ____________________________________________________________
 That task number does not exist.
@@ -390,7 +390,7 @@ OK, I've marked this task as not done yet:
   [T][ ] alpha
 ____________________________________________________________
 ____________________________________________________________
-That task number does not exist.
+Please specify a valid task number after unmark.
 ____________________________________________________________
 ____________________________________________________________
 Please specify a valid task number after unmark.
@@ -577,7 +577,7 @@ Nice! I've marked this task as done:
   [T][X] alpha
 ____________________________________________________________
 ____________________________________________________________
-That task number does not exist.
+Please specify a valid task number after delete.
 ____________________________________________________________
 ____________________________________________________________
 That task number does not exist.
@@ -1223,4 +1223,109 @@ ____________________________________________________________
 T | 1 | read novel
 D | 0 | submit report | 2026-09-10
 E | 0 | meeting | 3pm | 5pm
+```
+
+## UI-19: Reject duplicate and contradictory input without corrupting state
+
+**Aim:** Verify that flexible outer whitespace remains accepted while duplicate tasks, repeated parameters,
+invalid dates, reversed event ranges, invalid task numbers, and multi-field updates are rejected without changing
+the valid task list.
+
+**Input commands:**
+
+```text
+   todo   alpha
+todo alpha
+deadline report /by 2026-02-30
+deadline report /by 2026-12-01 /by 2026-12-02
+deadline report /by 2026-12-01
+event sprint /from 2026-12-02 /to 2026-12-01
+event sprint /to 2026-12-02 /from 2026-12-01
+event sprint /from 4pm /to 2pm
+event sprint /from 2026-12-01 /to 2026-12-02
+event sprint /from 2026-12-01 /to 2026-12-02
+mark 0
+mark 1 extra
+update 1 /description beta /to 5pm
+todo beta
+update 4 /description alpha
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____  _          _ 
+|  _ \(_)_  _____| |
+| |_) | \ \/ / _ \ |
+|  __/| |>  <  __/ |
+|_|   |_/_/\_\___|_|
+Hello! I'm Pixel.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] alpha
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+This task is already in your list.
+____________________________________________________________
+____________________________________________________________
+Oops! Please enter the deadline date in YYYY-MM-DD format.
+____________________________________________________________
+____________________________________________________________
+Oops! Please specify /by exactly once.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] report (by: Dec 01 2026)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Oops! The event start must be before the event end.
+____________________________________________________________
+____________________________________________________________
+Oops! Please place /from before /to.
+____________________________________________________________
+____________________________________________________________
+Oops! The event start must be before the event end.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] sprint (from: 2026-12-01 to: 2026-12-02)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+This task is already in your list.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+Please specify a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+Please update exactly one detail at a time.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] beta
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+That update would duplicate another task in your list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] alpha
+2.[D][ ] report (by: Dec 01 2026)
+3.[E][ ] sprint (from: 2026-12-01 to: 2026-12-02)
+4.[T][ ] beta
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
 ```
