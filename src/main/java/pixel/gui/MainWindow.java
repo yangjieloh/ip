@@ -32,6 +32,7 @@ public class MainWindow extends AnchorPane {
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.prefWidthProperty().bind(scrollPane.widthProperty());
     }
 
     /**
@@ -42,7 +43,7 @@ public class MainWindow extends AnchorPane {
     public void setPixel(Pixel pixel) {
         this.pixel = pixel;
         dialogContainer.getChildren().add(DialogBox.getPixelDialog(
-                "Hello! I'm Pixel.\nWhat can I do for you?"));
+                "GUIDE READY!\nI'm Pixel, your arcade guide.\nChoose a command to begin your quest."));
     }
 
     /**
@@ -51,11 +52,15 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
+        if (input.isBlank()) {
+            return;
+        }
         String response = pixel.getResponse(input);
 
-        dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input),
-                DialogBox.getPixelDialog(response));
+        DialogBox responseDialog = pixel.isLastResponseError()
+                ? DialogBox.getErrorDialog(response)
+                : DialogBox.getPixelDialog(response);
+        dialogContainer.getChildren().addAll(DialogBox.getUserDialog(input), responseDialog);
         userInput.clear();
 
         if ("bye".equals(input.trim())) {

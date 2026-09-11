@@ -18,6 +18,7 @@ public class Pixel {
     private final Parser parser;
     private final TaskList tasks;
     private final ArrayList<String> loadWarnings;
+    private boolean isLastResponseError;
 
     /**
      * Creates a Pixel chatbot backed by the specified data file.
@@ -39,6 +40,7 @@ public class Pixel {
      * @return Pixel's response, with one message per line.
      */
     public String getResponse(String input) {
+        isLastResponseError = false;
         StringBuilder response = new StringBuilder();
         Ui responseUi = new Ui(message -> {
             if (response.length() > 0) {
@@ -50,10 +52,21 @@ public class Pixel {
         try {
             Command command = parser.parse(input.trim());
             command.execute(tasks, responseUi, storage);
+            isLastResponseError = command.isError();
         } catch (IllegalArgumentException exception) {
+            isLastResponseError = true;
             response.append(exception.getMessage());
         }
         return response.toString();
+    }
+
+    /**
+     * Returns whether the latest GUI response reports invalid user input.
+     *
+     * @return Whether the latest response should use error presentation.
+     */
+    public boolean isLastResponseError() {
+        return isLastResponseError;
     }
 
     /** Starts Pixel's console command loop. */
