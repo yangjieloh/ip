@@ -20,8 +20,8 @@
         <VBox prefHeight="72.0" styleClass="app-header"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Label styleClass="app-title" text="Pixel" />
-                <Label styleClass="app-subtitle" text="Your focused task companion" />
+                <Label styleClass="app-title" text="PIXEL" />
+                <Label styleClass="app-subtitle" text="ARCADE GUIDE // ONLINE" />
             </children>
         </VBox>
         <HBox spacing="10.0" styleClass="composer"
@@ -29,12 +29,12 @@
             <children>
                 <TextField fx:id="userInput"
                            onAction="#handleUserInput"
-                           promptText="Type a command, e.g. list"
+                           promptText="Enter a command to continue..."
                            HBox.hgrow="ALWAYS" />
                 <Button fx:id="sendButton"
                         mnemonicParsing="false"
                         onAction="#handleUserInput"
-                        text="Send" />
+                        text="PLAY" />
             </children>
         </HBox>
         <ScrollPane fx:id="scrollPane"

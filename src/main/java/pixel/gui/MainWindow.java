@@ -43,7 +43,7 @@ public class MainWindow extends AnchorPane {
     public void setPixel(Pixel pixel) {
         this.pixel = pixel;
         dialogContainer.getChildren().add(DialogBox.getPixelDialog(
-                "Hello! I'm Pixel.\nWhat can I do for you?"));
+                "GUIDE READY!\nI'm Pixel, your arcade guide.\nChoose a command to begin your quest."));
     }
 
     /**

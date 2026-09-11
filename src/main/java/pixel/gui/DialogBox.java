@@ -38,7 +38,7 @@ public class DialogBox extends HBox {
      * @return Dialog box representing the user's message.
      */
     public static DialogBox getUserDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "YOU");
+        DialogBox dialogBox = new DialogBox(text, "PLAYER 1");
         dialogBox.getStyleClass().add("user-message");
         dialogBox.setAlignment(Pos.TOP_RIGHT);
         dialogBox.speaker.setManaged(false);
@@ -54,7 +54,7 @@ public class DialogBox extends HBox {
      * @return Dialog box representing Pixel's response.
      */
     public static DialogBox getPixelDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "PIXEL");
+        DialogBox dialogBox = new DialogBox(text, "PIXEL // GUIDE");
         dialogBox.getStyleClass().add("pixel-message");
         dialogBox.dialog.setMaxWidth(Double.MAX_VALUE);
         return dialogBox;
@@ -67,7 +67,7 @@ public class DialogBox extends HBox {
      * @return Dialog box using Pixel's error presentation.
      */
     public static DialogBox getErrorDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "PIXEL · ERROR");
+        DialogBox dialogBox = new DialogBox(text, "PIXEL // ALERT");
         dialogBox.getStyleClass().addAll("pixel-message", "error-message");
         dialogBox.dialog.setMaxWidth(Double.MAX_VALUE);
         return dialogBox;

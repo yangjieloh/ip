@@ -26,7 +26,7 @@ public class Main extends Application {
             MainWindow controller = fxmlLoader.getController();
             controller.setPixel(pixel);
 
-            stage.setTitle("Pixel");
+            stage.setTitle("Pixel // Quest Console");
             stage.setScene(new Scene(mainWindow));
             stage.setMinWidth(420);
             stage.setMinHeight(480);
