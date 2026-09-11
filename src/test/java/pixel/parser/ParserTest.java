@@ -10,6 +10,7 @@ import pixel.command.Command;
 import pixel.command.DateCommand;
 import pixel.command.DeleteCommand;
 import pixel.command.ExitCommand;
+import pixel.command.FindCommand;
 import pixel.command.ListCommand;
 import pixel.command.MarkCommand;
 import pixel.command.UnknownCommand;
@@ -25,6 +26,7 @@ class ParserTest {
         assertInstanceOf(ExitCommand.class, parser.parse("bye"));
         assertInstanceOf(ListCommand.class, parser.parse("list"));
         assertInstanceOf(DateCommand.class, parser.parse("date 2019-10-15"));
+        assertInstanceOf(FindCommand.class, parser.parse("find book"));
         assertInstanceOf(MarkCommand.class, parser.parse("mark 1"));
         assertInstanceOf(UnmarkCommand.class, parser.parse("unmark 1"));
         assertInstanceOf(AddCommand.class, parser.parse("todo read book"));
@@ -63,6 +65,7 @@ class ParserTest {
     void parse_missingOrMalformedQueryArguments_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> parser.parse("date"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("date 2019-02-30"));
+        assertThrows(IllegalArgumentException.class, () -> parser.parse("find"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark zero"));
         assertThrows(IllegalArgumentException.class, () -> parser.parse("mark 0"));
@@ -87,5 +90,13 @@ class ParserTest {
         assertInstanceOf(MarkCommand.class, mark);
         assertInstanceOf(DeleteCommand.class, delete);
         assertInstanceOf(UpdateCommand.class, update);
+    }
+
+    @Test
+    void parse_validUpdateFields_returnUpdateCommands() {
+        assertInstanceOf(UpdateCommand.class, parser.parse("update 1 /description revised"));
+        assertInstanceOf(UpdateCommand.class, parser.parse("update 1 /by 2026-09-12"));
+        assertInstanceOf(UpdateCommand.class, parser.parse("update 1 /from 2pm"));
+        assertInstanceOf(UpdateCommand.class, parser.parse("update 1 /to 4pm"));
     }
 }

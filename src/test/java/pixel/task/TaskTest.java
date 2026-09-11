@@ -78,6 +78,15 @@ class TaskTest {
     }
 
     @Test
+    void containsKeyword_presentAbsentAndCaseDifference_returnsExpectedResults() {
+        Task task = new Todo("Read library book");
+
+        assertTrue(task.containsKeyword("library"));
+        assertFalse(task.containsKeyword("Library"));
+        assertFalse(task.containsKeyword("missing"));
+    }
+
+    @Test
     void toString_plainTask_includesStatusAndDescription() {
         Task task = new Task("read book");
 

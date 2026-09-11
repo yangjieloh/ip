@@ -55,6 +55,18 @@ class StorageTest {
     }
 
     @Test
+    void load_pathIsDirectory_returnsEmptyTasksWithWarning(@TempDir Path tempDir) {
+        Storage storage = new Storage(tempDir);
+        ArrayList<String> warnings = new ArrayList<>();
+
+        ArrayList<Task> loaded = storage.load(warnings);
+
+        assertTrue(loaded.isEmpty());
+        assertEquals(1, warnings.size());
+        assertTrue(warnings.get(0).contains("couldn't read the saved tasks"));
+    }
+
+    @Test
     void load_mixedValidAndInvalidRecords_recoversValidTasksAndReportsWarnings(@TempDir Path tempDir)
             throws Exception {
         Path file = tempDir.resolve("pixel.txt");
