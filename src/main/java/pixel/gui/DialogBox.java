@@ -1,14 +1,9 @@
 package pixel.gui;
 
 import java.io.IOException;
-import java.util.Collections;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -43,8 +38,12 @@ public class DialogBox extends HBox {
      * @return Dialog box representing the user's message.
      */
     public static DialogBox getUserDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "You");
+        DialogBox dialogBox = new DialogBox(text, "YOU");
         dialogBox.getStyleClass().add("user-message");
+        dialogBox.setAlignment(Pos.TOP_RIGHT);
+        dialogBox.speaker.setManaged(false);
+        dialogBox.speaker.setVisible(false);
+        dialogBox.dialog.setMaxWidth(360);
         return dialogBox;
     }
 
@@ -55,17 +54,22 @@ public class DialogBox extends HBox {
      * @return Dialog box representing Pixel's response.
      */
     public static DialogBox getPixelDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "Pixel");
-        dialogBox.flip();
+        DialogBox dialogBox = new DialogBox(text, "PIXEL");
         dialogBox.getStyleClass().add("pixel-message");
+        dialogBox.dialog.setMaxWidth(Double.MAX_VALUE);
         return dialogBox;
     }
 
-    /** Flips the speaker label to the left side for Pixel's messages. */
-    private void flip() {
-        ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
-        Collections.reverse(children);
-        getChildren().setAll(children);
-        setAlignment(Pos.TOP_LEFT);
+    /**
+     * Creates a prominent dialog for an invalid command or argument.
+     *
+     * @param text Error response from Pixel.
+     * @return Dialog box using Pixel's error presentation.
+     */
+    public static DialogBox getErrorDialog(String text) {
+        DialogBox dialogBox = new DialogBox(text, "PIXEL · ERROR");
+        dialogBox.getStyleClass().addAll("pixel-message", "error-message");
+        dialogBox.dialog.setMaxWidth(Double.MAX_VALUE);
+        return dialogBox;
     }
 }

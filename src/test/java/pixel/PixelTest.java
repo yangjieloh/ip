@@ -1,6 +1,7 @@
 package pixel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
@@ -39,6 +40,21 @@ class PixelTest {
         String response = pixel.getResponse("bye");
 
         assertEquals("Bye. Hope to see you again soon!", response);
+        assertFalse(pixel.isLastResponseError());
+    }
+
+    @Test
+    void isLastResponseError_invalidThenValidCommand_tracksLatestResponse(@TempDir Path tempDir) {
+        Pixel pixel = new Pixel(tempDir.resolve("pixel.txt"));
+
+        pixel.getResponse("blah");
+        assertTrue(pixel.isLastResponseError());
+
+        pixel.getResponse("todo");
+        assertTrue(pixel.isLastResponseError());
+
+        pixel.getResponse("list");
+        assertFalse(pixel.isLastResponseError());
     }
 
     @Test

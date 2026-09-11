@@ -17,4 +17,9 @@ public class UnknownCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Sorry, I don't recognise that command.");
     }
+
+    @Override
+    public boolean isError() {
+        return true;
+    }
 }

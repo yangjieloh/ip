@@ -28,6 +28,11 @@ public class Main extends Application {
 
             stage.setTitle("Pixel");
             stage.setScene(new Scene(mainWindow));
+            stage.setMinWidth(420);
+            stage.setMinHeight(480);
+            stage.setWidth(560);
+            stage.setHeight(680);
+            stage.setResizable(true);
             stage.show();
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load the Pixel GUI.", exception);

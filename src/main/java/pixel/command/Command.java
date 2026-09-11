@@ -34,6 +34,15 @@ public abstract class Command {
     }
 
     /**
+     * Indicates whether this command represents invalid user input.
+     *
+     * @return {@code true} only for commands that should use error presentation.
+     */
+    public boolean isError() {
+        return false;
+    }
+
+    /**
      * Saves task changes while keeping Pixel usable if the write fails.
      *
      * @param tasks Task list to save.
